@@ -43,7 +43,7 @@ function handleFileSelect_csv(evt) {
 }
 function getDummyDict(){
 	var varDict = new Object();
-	varDict["S"] = 10;
+	varDict["S"] = 20;
 	varDict["b"] = 10;
 	varDict["l_{fuel}"] = 3;
 	varDict["d"] = 4;
@@ -52,7 +52,7 @@ function getDummyDict(){
 	varDict["S_v"] = 4;
 	varDict["b_h"] = 4;
 	varDict["b_v"] = 5;
-	varDict["lambda"] = 0.5;
+	varDict["lambda"] = 5;
 	varDict["t_sep/d"] = 3;
 	varDict["fuse_len"] = 10;
 	return varDict;
@@ -88,11 +88,164 @@ function updateRendering(varDict){
 	//syntax is span, aspect ratio, S
 	var mesh = new Mesh("liftSurf",wing,varDict["b"],varDict["S"],varDict["lambda"])
 	var position = new Position(wing,{x:fuselage.geometry.position.x.val,y:0,z:fuselage.geometry.mesh.d.val/2}) 
-	var rotation = fuselage.rotation
+	var rotation = fuselage.geometry.rotation
 	wing.geometry = new Geometry(mesh,position,rotation)
 	drawWing(ComponentColors.wing,wing.geometry.mesh,wing.geometry.position,wing.geometry.rotation)
 
 
+	var extrudeSettings = {
+					curveSegments	: 100,
+					steps			: 200,
+					bevelEnabled	: true,
+					bevelDepth		: 20,
+					bevelSize		: 20,
+					bevelSegments	: 2,
+					amount			: 100
+	};
+	a = 10
+	b = 10
+	var line = new THREE.SplineCurve( 
+                [
+                 new THREE.Vector2(a*0.0000000, b*0.0000000),
+				 new THREE.Vector2(a*0.0005839, b*0.0042603),
+				 new THREE.Vector2(a*0.0023342, b*0.0084289),
+				 new THREE.Vector2(a*0.0052468, b*0.0125011),
+				 new THREE.Vector2(a*0.0093149, b*0.0164706),
+				 new THREE.Vector2(a*0.0145291, b*0.0203300),
+				 new THREE.Vector2(a*0.0208771, b*0.0240706),
+				 new THREE.Vector2(a*0.0283441, b*0.0276827),
+				 new THREE.Vector2(a*0.0369127, b*0.0311559),
+				 new THREE.Vector2(a*0.0465628, b*0.0344792),
+				 new THREE.Vector2(a*0.0572720, b*0.0376414),
+				 new THREE.Vector2(a*0.0690152, b*0.0406310),
+				 new THREE.Vector2(a*0.0817649, b*0.0434371),
+				 new THREE.Vector2(a*0.0954915, b*0.0460489),
+				 new THREE.Vector2(a*0.1101628, b*0.0484567),
+				 new THREE.Vector2(a*0.1257446, b*0.0506513),
+				 new THREE.Vector2(a*0.1422005, b*0.0526251),
+				 new THREE.Vector2(a*0.1594921, b*0.0543715),
+				 new THREE.Vector2(a*0.1775789, b*0.0558856),
+				 new THREE.Vector2(a*0.1964187, b*0.0571640),
+				 new THREE.Vector2(a*0.2159676, b*0.0582048),
+				 new THREE.Vector2(a*0.2361799, b*0.0590081),
+				 new THREE.Vector2(a*0.2570083, b*0.0595755),
+				 new THREE.Vector2(a*0.2784042, b*0.0599102),
+				 new THREE.Vector2(a*0.3003177, b*0.0600172),
+				 new THREE.Vector2(a*0.3226976, b*0.0599028),
+				 new THREE.Vector2(a*0.3454915, b*0.0595747),
+				 new THREE.Vector2(a*0.3686463, b*0.0590419),
+				 new THREE.Vector2(a*0.3921079, b*0.0583145),
+				 new THREE.Vector2(a*0.4158215, b*0.0574033),
+				 new THREE.Vector2(a*0.4397317, b*0.0563200),
+				 new THREE.Vector2(a*0.4637826, b*0.0550769),
+				 new THREE.Vector2(a*0.4879181, b*0.0536866),
+				 new THREE.Vector2(a*0.5120819, b*0.0521620),
+				 new THREE.Vector2(a*0.5362174, b*0.0505161),
+				 new THREE.Vector2(a*0.5602683, b*0.0487619),
+				 new THREE.Vector2(a*0.5841786, b*0.0469124),
+				 new THREE.Vector2(a*0.6078921, b*0.0449802),
+				 new THREE.Vector2(a*0.6313537, b*0.0429778),
+				 new THREE.Vector2(a*0.6545085, b*0.0409174),
+				 new THREE.Vector2(a*0.6773025, b*0.0388109),
+				 new THREE.Vector2(a*0.6996823, b*0.0366700),
+				 new THREE.Vector2(a*0.7215958, b*0.0345058),
+				 new THREE.Vector2(a*0.7429917, b*0.0323294),
+				 new THREE.Vector2(a*0.7638202, b*0.0301515),
+				 new THREE.Vector2(a*0.7840324, b*0.0279828),
+				 new THREE.Vector2(a*0.8035813, b*0.0258337),
+				 new THREE.Vector2(a*0.8224211, b*0.0237142),
+				 new THREE.Vector2(a*0.8405079, b*0.0216347),
+				 new THREE.Vector2(a*0.8577995, b*0.0196051),
+				 new THREE.Vector2(a*0.8742554, b*0.0176353),
+				 new THREE.Vector2(a*0.8898372, b*0.0157351),
+				 new THREE.Vector2(a*0.9045085, b*0.0139143),
+				 new THREE.Vector2(a*0.9182351, b*0.0121823),
+				 new THREE.Vector2(a*0.9309849, b*0.0105485),
+				 new THREE.Vector2(a*0.9427280, b*0.0090217),
+				 new THREE.Vector2(a*0.9534372, b*0.0076108),
+				 new THREE.Vector2(a*0.9630873, b*0.0063238),
+				 new THREE.Vector2(a*0.9716559, b*0.0051685),
+				 new THREE.Vector2(a*0.9791229, b*0.0041519),
+				 new THREE.Vector2(a*0.9854709, b*0.0032804),
+				 new THREE.Vector2(a*0.9906850, b*0.0025595),
+				 new THREE.Vector2(a*0.9947532, b*0.0019938),
+				 new THREE.Vector2(a*0.9976658, b*0.0015870),
+				 new THREE.Vector2(a*0.9994161, b*0.0013419),
+				 new THREE.Vector2(a*1.0000000, b*0.0012600),
+				 new THREE.Vector2(a*1.0000000, b*-.0000000),
+				 new THREE.Vector2(a*0.9994161, b*-.0013419),
+				 new THREE.Vector2(a*0.9976658, b*-.0015870),
+				 new THREE.Vector2(a*0.9947532, b*-.0019938),
+				 new THREE.Vector2(a*0.9906850, b*-.0025595),
+				 new THREE.Vector2(a*0.9854709, b*-.0032804),
+				 new THREE.Vector2(a*0.9791229, b*-.0041519),
+				 new THREE.Vector2(a*0.9716559, b*-.0051685),
+				 new THREE.Vector2(a*0.9630873, b*-.0063238),
+				 new THREE.Vector2(a*0.9534372, b*-.0076108),
+				 new THREE.Vector2(a*0.9427280, b*-.0090217),
+				 new THREE.Vector2(a*0.9309849, b*-.0105485),
+				 new THREE.Vector2(a*0.9182351, b*-.0121823),
+				 new THREE.Vector2(a*0.9045085, b*-.0139143),
+				 new THREE.Vector2(a*0.8898372, b*-.0157351),
+				 new THREE.Vector2(a*0.8742554, b*-.0176353),
+				 new THREE.Vector2(a*0.8577995, b*-.0196051),
+				 new THREE.Vector2(a*0.8405079, b*-.0216347),
+				 new THREE.Vector2(a*0.8224211, b*-.0237142),
+				 new THREE.Vector2(a*0.8035813, b*-.0258337),
+				 new THREE.Vector2(a*0.7840324, b*-.0279828),
+				 new THREE.Vector2(a*0.7638202, b*-.0301515),
+				 new THREE.Vector2(a*0.7429917, b*-.0323294),
+				 new THREE.Vector2(a*0.7215958, b*-.0345058),
+				 new THREE.Vector2(a*0.6996823, b*-.0366700),
+				 new THREE.Vector2(a*0.6773025, b*-.0388109),
+				 new THREE.Vector2(a*0.6545085, b*-.0409174),
+				 new THREE.Vector2(a*0.6313537, b*-.0429778),
+				 new THREE.Vector2(a*0.6078921, b*-.0449802),
+				 new THREE.Vector2(a*0.5841786, b*-.0469124),
+				 new THREE.Vector2(a*0.5602683, b*-.0487619),
+				 new THREE.Vector2(a*0.5362174, b*-.0505161),
+				 new THREE.Vector2(a*0.5120819, b*-.0521620),
+				 new THREE.Vector2(a*0.4879181, b*-.0536866),
+				 new THREE.Vector2(a*0.4637826, b*-.0550769),
+				 new THREE.Vector2(a*0.4397317, b*-.0563200),
+				 new THREE.Vector2(a*0.4158215, b*-.0574033),
+				 new THREE.Vector2(a*0.3921079, b*-.0583145),
+				 new THREE.Vector2(a*0.3686463, b*-.0590419),
+				 new THREE.Vector2(a*0.3454915, b*-.0595747),
+				 new THREE.Vector2(a*0.3226976, b*-.0599028),
+				 new THREE.Vector2(a*0.3003177, b*-.0600172),
+				 new THREE.Vector2(a*0.2784042, b*-.0599102),
+				 new THREE.Vector2(a*0.2570083, b*-.0595755),
+				 new THREE.Vector2(a*0.2361799, b*-.0590081),
+				 new THREE.Vector2(a*0.2159676, b*-.0582048),
+				 new THREE.Vector2(a*0.1964187, b*-.0571640),
+				 new THREE.Vector2(a*0.1775789, b*-.0558856),
+				 new THREE.Vector2(a*0.1594921, b*-.0543715),
+				 new THREE.Vector2(a*0.1422005, b*-.0526251),
+				 new THREE.Vector2(a*0.1257446, b*-.0506513),
+				 new THREE.Vector2(a*0.1101628, b*-.0484567),
+				 new THREE.Vector2(a*0.0954915, b*-.0460489),
+				 new THREE.Vector2(a*0.0817649, b*-.0434371),
+				 new THREE.Vector2(a*0.0690152, b*-.0406310),
+				 new THREE.Vector2(a*0.0572720, b*-.0376414),
+				 new THREE.Vector2(a*0.0465628, b*-.0344792),
+				 new THREE.Vector2(a*0.0369127, b*-.0311559),
+				 new THREE.Vector2(a*0.0283441, b*-.0276827),
+				 new THREE.Vector2(a*0.0208771, b*-.0240706),
+				 new THREE.Vector2(a*0.0145291, b*-.0203300),
+				 new THREE.Vector2(a*0.0093149, b*-.0164706),
+				 new THREE.Vector2(a*0.0052468, b*-.0125011),
+				 new THREE.Vector2(a*0.0023342, b*-.0084289),
+				 new THREE.Vector2(a*0.0005839, b*-.0042603),
+				 new THREE.Vector2(a*0.000000,b*0.0000000)
+
+                ]);
+	var shape = new THREE.Shape(line.getSpacedPoints(100));
+	var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+	
+	var material = new THREE.MeshLambertMaterial( { color: 0xb00000, wireframe: false } );
+	var mesh = new THREE.Mesh( geometry, material );
+	scene.add( mesh );
 	// 	varDict["S"] = 10;
 	// varDict["b"] = 10;
 	// varDict["l_{fuel}"] = 3;
@@ -240,9 +393,9 @@ drawWing = function(color,mesh,position,rotation){
 	//Returns the rectangle object drawn, for reference by others
 	//Need to puull a chord out of the aspect ratio and S
 	// span = Math.pow(mesh.S.val*mesh.lambda.val,0.5)
-	meanChord = mesh.b.val/mesh.lamda.val
-	thickness = 0.1
-	geometry = new THREE.BoxGeometry( meanChord, mesh.b.val,meanChord*thickness);
+	meanChord = mesh.b.val*mesh.lambda.val
+	thickness = 0.03*meanChord
+	geometry = new THREE.BoxGeometry( meanChord, mesh.b.val,thickness);
 	material = new THREE.MeshPhongMaterial( { color: color} );
 	mesh = new THREE.Mesh( geometry, material );
 	mesh.position.set(position.x.val,position.y.val,position.z.val)
