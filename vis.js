@@ -1,3 +1,23 @@
+var Colors = {
+	//https://coolors.co/app/0a122a-274c77-6096ba-a3cef1-cdd6dd
+	maastricht:0x0A122A,
+	stpatricks:0x274c77,
+	silverlake:0x6096ba,
+	bbyblue:0xa3cef1,
+	columbia:0xcdd6dd,
+}
+
+var ComponentColors = {
+	fuselage:Colors.stpatricks,
+	payload:Colors.silverlake,
+	plate:Colors.maastricht,
+	esc:Colors.bbyblue,
+	motor:Colors.bbyblue,
+	propellers:Colors.silverlake
+}
+
+
+
 function handleFileSelect_csv(evt) {
     var files = evt.target.files; // FileList object
   	var varDict = new Object();
@@ -34,27 +54,193 @@ function getDummyDict(){
 	varDict["b_v"] = 5;
 	varDict["lambda"] = 0.5;
 	varDict["t_sep/d"] = 3;
+	varDict["fuse_len"] = 10;
 	return varDict;
 }
 
 function updateRendering(varDict){
 	console.log(varDict)
-	var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
-	geometry.dynamic = true;
-	var material =  new THREE.MeshPhongMaterial( { color:0xcccccc, shading: THREE.FlatShading } );
-	var mesh = new THREE.Mesh( geometry, material );
-	mesh.position.x = 0;
-	mesh.position.y = 0;
-	mesh.position.z = 0;
-	mesh.rotation.x = Math.PI/2
-	mesh.rotation.z = Math.PI/2
-	mesh.updateMatrix();
-	mesh.matrixAutoUpdate = false;
-		mesh.castShadow = true;
-	mesh.receiveShadow = true;
-	scene.add( mesh );	
-	drawBoxOld("#cccccc",20,20,20,0,0,0)
+
+	//Geometry
+	fuselage = new Object();
+	var mesh = new Mesh("cyl",fuselage,varDict["d"],varDict["fuse_len"])
+	var position = new Position(fuselage,{x:varDict["fuse_len"]/2,y:0,z:0})
+	var rotation = new Rotation(fuselage,{x:0,y:0,z:Math.PI/2})
+	fuselage.geometry = new Geometry(mesh,position,rotation)
+	drawCyl(ComponentColors.fuselage,fuselage.geometry.mesh,fuselage.geometry.position,fuselage.geometry.rotation)
+	
+	frontCap = new Object();
+	var mesh = new Mesh("hemi",frontCap,varDict["d"])
+	var position = new Position(frontCap,{x:fuselage.geometry.position.x.val + varDict["fuse_len"]*0.5,y:0,z:0})
+	var rotation = new Rotation(frontCap,{x:0,y:0,z:-Math.PI/2})
+	frontCap.geometry = new Geometry(mesh,position,rotation)
+	drawHemi(ComponentColors.fuselage,frontCap.geometry.mesh,frontCap.geometry.position,frontCap.geometry.rotation)
+
+	rearCap = new Object();
+	var mesh = new Mesh("hemi",frontCap,varDict["d"])
+	var position = new Position(frontCap,{x:fuselage.geometry.position.x.val-varDict["fuse_len"]*0.5,y:0,z:0})
+	var rotation = new Rotation(frontCap,{x:0,y:0,z:Math.PI/2})
+	frontCap.geometry = new Geometry(mesh,position,rotation)
+	drawHemi(ComponentColors.fuselage,frontCap.geometry.mesh,frontCap.geometry.position,frontCap.geometry.rotation)
+
+	
+	wing = new Object();
+	//syntax is span, aspect ratio, S
+
+	// var mesh = new Mesh("liftSurf",wing,varDict["b"],varDict["S"],varDict["lambda"])
+	// var position = new 
+
+	// 	varDict["S"] = 10;
+	// varDict["b"] = 10;
+	// varDict["l_{fuel}"] = 3;
+	// varDict["d"] = 4;
+	// varDict["L"] = 10; //gonna guess this is fuselage length
+	// varDict["S_h"] = 3;
+	// varDict["S_v"] = 4;
+	// varDict["b_h"] = 4;
+	// varDict["b_v"] = 5;
+	// varDict["lambda"] = 0.5;
+	// varDict["t_sep/d"] = 3;
+	// varDict["fuse_len"] = 10;
 }
+
+Mesh = function(){
+	type = arguments[0]
+	parentObj = arguments[1]
+	this.type = type
+	this.volume = new Variable("volume"+parentObj.nameStr,"m^3")
+	if (type=="rect"){
+		this.xlen = new Variable("xlen"+parentObj.nameStr,arguments[2],"m")
+		this.ylen = new Variable("ylen"+parentObj.nameStr,arguments[3],"m")
+		this.zlen = new Variable("zlen"+parentObj.nameStr,arguments[4],"m")
+	}
+	if (type=="cyl"){
+		this.d = new Variable("d"+parentObj.nameStr,arguments[2],"m")
+		this.h = new Variable("h"+parentObj.nameStr,arguments[3],"m")
+	}
+	if (type=="hemi"){
+		this.d = new Variable("d"+parentObj.nameStr,arguments[2],"m")
+	}
+}
+
+Position = function(parentObj,valDict){
+	this.x = new Variable("xpos"+parentObj.nameStr,valDict.x,"m")
+	this.y = new Variable("ypos"+parentObj.nameStr,valDict.y,"m")
+	this.z = new Variable("zpos"+parentObj.nameStr,valDict.z,"m")
+
+	if (valDict.x == undefined){
+		this.x = new Variable("xpos"+parentObj.nameStr,"m")
+	}
+	if (valDict.y == undefined){
+		this.y = new Variable("ypos"+parentObj.nameStr,"m")
+	}
+	if (valDict.z == undefined){
+		this.z = new Variable("zpos"+parentObj.nameStr,"m")
+	}
+	console.log(this)
+}
+
+Rotation = function(parentObj,valDict){
+	this.x = new Variable("xrot"+parentObj.nameStr,valDict.x,"degrees")
+	this.y = new Variable("yrot"+parentObj.nameStr,valDict.y,"degrees")
+	this.z = new Variable("zrot"+parentObj.nameStr,valDict.z,"degrees")
+
+	if (valDict.x == undefined){
+		this.x = new Variable("xrot"+parentObj.nameStr,"degrees")
+	}
+	if (valDict.y == undefined){
+		this.y = new Variable("yrot"+parentObj.nameStr,"degrees")
+	}
+	if (valDict.z == undefined){
+		this.z = new Variable("zrot"+parentObj.nameStr,"degrees")
+	}
+}
+
+Geometry = function(mesh,position,rotation){
+	this.mesh = mesh
+	this.position = position
+	this.rotation = rotation
+	this.matesArr = []
+
+	this.getFace = function(faceStr){
+		if (faceStr=="z_upper"){
+			var xArr = []
+			var yArr = []
+			var zArr = []
+			xArr.push(this.position.x)
+		}
+	}
+	this.getConstraints = function(){
+		var constraints = []
+		// constraints.push.apply(constraints,this.mesh.getConstraints())
+		// console.log(this.matesArr)
+		for(var i = 0; i<this.matesArr.length; i++){
+			constraints.push.apply(constraints,this.matesArr[i].getConstraints())
+		}
+		return constraints;
+	}
+}
+
+
+drawBox = function(color,mesh,position,rotation){
+	//Inputs are color, then mesh, position,rotation
+	//Returns the rectangle object drawn, for reference by others
+	geometry = new THREE.BoxGeometry( mesh.xlen.val, mesh.ylen.val,mesh.zlen.val);
+	material = new THREE.MeshPhongMaterial( { color: color} );
+	mesh = new THREE.Mesh( geometry, material );
+	mesh.position.set(position.x.val,position.y.val,position.z.val)
+	mesh.rotation.set(rotation.x.val,rotation.y.val,rotation.z.val)
+	mesh.castShadow = true;
+	mesh.receiveShadow = true;
+	geometry.dynamic = true
+	scene.add( mesh );
+	return mesh;
+}
+
+drawCyl = function(color,mesh,position,rotation){
+	//Inputs are color, then mesh, position,rotation
+	//Returns the cylinder object drawn, for reference by others
+	geometry = new THREE.CylinderGeometry( mesh.d.val*0.5,mesh.d.val*0.5,mesh.h.val,10);
+	material = new THREE.MeshPhongMaterial( { color: color} );
+	mesh = new THREE.Mesh( geometry, material );
+	mesh.position.set(position.x.val,position.y.val,position.z.val)
+	mesh.rotation.set(rotation.x.val,rotation.y.val,rotation.z.val)
+	mesh.castShadow = true;
+	mesh.receiveShadow = true;
+	geometry.dynamic = true
+	scene.add( mesh );
+	return mesh;
+}
+
+drawHemi = function(color,mesh,position,rotation){
+	//Make spinner
+	var geometry = new THREE.SphereGeometry( mesh.d.val*0.5, 10, 10, Math.PI, Math.PI, 3*Math.PI/2);
+	var material = new THREE.MeshPhongMaterial( { color: color, wireframe:true} );
+	var mesh = new THREE.Mesh( geometry, material );
+	mesh.position.set(position.x.val,position.y.val,position.z.val)
+	mesh.rotation.set(rotation.x.val,rotation.y.val,rotation.z.val)
+	console.log(mesh)
+	mesh.material.side = THREE.DoubleSide;
+	// spinnerHemi.rotateX(Math.radians(90))
+	mesh.castShadow = true;
+	mesh.receiveShadow = true;
+	geometry.dynamic = true
+	scene.add( mesh );
+
+	// //Inputs are color, then mesh, position,rotation
+	// //Returns the cylinder object drawn, for reference by others
+	// geometry = new THREE.CylinderGeometry( mesh.d.val*0.5,mesh.d.val*0.5,mesh.d.val,10);
+	// material = new THREE.MeshPhongMaterial( { color: color} );
+	// mesh = new THREE.Mesh( geometry, material );
+	// mesh.position.set(position.x.val,position.y.val,position.z.val)
+	// mesh.rotation.set(rotation.x.val,rotation.y.val,rotation.z.val)
+	// mesh.castShadow = true;
+	// mesh.receiveShadow = true;
+	// geometry.dynamic = true
+	// scene.add( mesh );
+	// return mesh;
+}
+
 
 $(document).ready(function(){
   console.log('jh')
@@ -110,7 +296,7 @@ function init() {
 	//
 	window.addEventListener( 'resize', onWindowResize, false );
 	//
-		updateRendering();
+	updateRendering(getDummyDict());
 
 	render();
 }
