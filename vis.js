@@ -256,7 +256,7 @@ drawWing = function(color,mesh,position,rotation){
 
 
 $(document).ready(function(){
-  console.log('jh')
+	
   // updateRendering(getDummyDict())
   document.getElementById('files_csv').addEventListener('change', handleFileSelect_csv, false);
   init();
