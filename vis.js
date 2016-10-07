@@ -9,7 +9,7 @@ var Colors = {
 
 var ComponentColors = {
 	fuselage:Colors.stpatricks,
-	payload:Colors.silverlake,
+	wing:Colors.silverlake,
 	plate:Colors.maastricht,
 	esc:Colors.bbyblue,
 	motor:Colors.bbyblue,
@@ -86,9 +86,12 @@ function updateRendering(varDict){
 	
 	wing = new Object();
 	//syntax is span, aspect ratio, S
+	var mesh = new Mesh("liftSurf",wing,varDict["b"],varDict["S"],varDict["lambda"])
+	var position = new Position(wing,{x:fuselage.geometry.position.x.val,y:0,z:fuselage.geometry.mesh.d.val/2}) 
+	var rotation = fuselage.rotation
+	wing.geometry = new Geometry(mesh,position,rotation)
+	drawWing(ComponentColors.wing,wing.geometry.mesh,wing.geometry.position,wing.geometry.rotation)
 
-	// var mesh = new Mesh("liftSurf",wing,varDict["b"],varDict["S"],varDict["lambda"])
-	// var position = new 
 
 	// 	varDict["S"] = 10;
 	// varDict["b"] = 10;
@@ -120,6 +123,11 @@ Mesh = function(){
 	}
 	if (type=="hemi"){
 		this.d = new Variable("d"+parentObj.nameStr,arguments[2],"m")
+	}
+	if (type=="liftSurf"){
+		this.b = new Variable("b"+parentObj.nameStr,arguments[2],"m")
+		this.S = new Variable("S"+parentObj.nameStr,arguments[3],"m")
+		this.lambda = new Variable("lambda"+parentObj.nameStr,arguments[4],"m")
 	}
 }
 
@@ -221,24 +229,29 @@ drawHemi = function(color,mesh,position,rotation){
 	mesh.rotation.set(rotation.x.val,rotation.y.val,rotation.z.val)
 	console.log(mesh)
 	mesh.material.side = THREE.DoubleSide;
-	// spinnerHemi.rotateX(Math.radians(90))
 	mesh.castShadow = true;
 	mesh.receiveShadow = true;
 	geometry.dynamic = true
 	scene.add( mesh );
+}
 
-	// //Inputs are color, then mesh, position,rotation
-	// //Returns the cylinder object drawn, for reference by others
-	// geometry = new THREE.CylinderGeometry( mesh.d.val*0.5,mesh.d.val*0.5,mesh.d.val,10);
-	// material = new THREE.MeshPhongMaterial( { color: color} );
-	// mesh = new THREE.Mesh( geometry, material );
-	// mesh.position.set(position.x.val,position.y.val,position.z.val)
-	// mesh.rotation.set(rotation.x.val,rotation.y.val,rotation.z.val)
-	// mesh.castShadow = true;
-	// mesh.receiveShadow = true;
-	// geometry.dynamic = true
-	// scene.add( mesh );
-	// return mesh;
+drawWing = function(color,mesh,position,rotation){
+	//Inputs are color, then mesh, position,rotation
+	//Returns the rectangle object drawn, for reference by others
+	//Need to puull a chord out of the aspect ratio and S
+	// span = Math.pow(mesh.S.val*mesh.lambda.val,0.5)
+	meanChord = mesh.b.val/mesh.lamda.val
+	thickness = 0.1
+	geometry = new THREE.BoxGeometry( meanChord, mesh.b.val,meanChord*thickness);
+	material = new THREE.MeshPhongMaterial( { color: color} );
+	mesh = new THREE.Mesh( geometry, material );
+	mesh.position.set(position.x.val,position.y.val,position.z.val)
+	mesh.rotation.set(rotation.x.val,rotation.y.val,rotation.z.val)
+	mesh.castShadow = true;
+	mesh.receiveShadow = true;
+	geometry.dynamic = true
+	scene.add( mesh );
+	return mesh;
 }
 
 
