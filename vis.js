@@ -10,7 +10,7 @@ var Colors = {
 var ComponentColors = {
 	fuselage:Colors.stpatricks,
 	wing:Colors.silverlake,
-	plate:Colors.maastricht,
+	stabilizer:Colors.maastricht,
 	esc:Colors.bbyblue,
 	motor:Colors.bbyblue,
 	propellers:Colors.silverlake
@@ -44,17 +44,24 @@ function handleFileSelect_csv(evt) {
 function getDummyDict(){
 	var varDict = new Object();
 	varDict["S"] = 20;
-	varDict["b"] = 10;
+	varDict["b"] = 30;
 	varDict["l_{fuel}"] = 3;
 	varDict["d"] = 4;
-	varDict["L"] = 10; //gonna guess this is fuselage length
-	varDict["S_h"] = 3;
+	varDict["L"] = 10; //length out to booms
+	varDict["S_h"] = 5;
 	varDict["S_v"] = 4;
 	varDict["b_h"] = 4;
 	varDict["b_v"] = 5;
-	varDict["lambda"] = 5;
-	varDict["t_sep/d"] = 3;
+	varDict["lambda"] = 2;
+	varDict["t_sep/d"] = 2.5;
 	varDict["fuse_len"] = 10;
+
+	//Constants used to draw something really
+	varDict["tailBoomAR"] = 20;
+	varDict["lambda_h"] = 1;
+	varDict["lambda_v"] = 1;
+	varDict["shaft_len"] = 1;
+	varDict["d_prop"] = 5;
 	return varDict;
 }
 
@@ -92,6 +99,37 @@ function updateRendering(varDict){
 	wing.geometry = new Geometry(mesh,position,rotation)
 	drawWing(ComponentColors.wing,wing.geometry.mesh,wing.geometry.position,wing.geometry.rotation)
 
+	//Draw tails -1 is left when viewed from rear, +1 is right
+	for (var i = -1; i < 2; i = i+2){
+		boom = new Object();
+		var mesh = new Mesh("cyl",boom,varDict["L"]/varDict["tailBoomAR"],varDict["L"])
+		var position = new Position(boom,{x:varDict["fuse_len"]/2+varDict["L"]/2,y:i*varDict["t_sep/d"]*varDict["d"]*0.5,z:fuselage.geometry.mesh.d.val/2})
+		var rotation = fuselage.geometry.rotation;
+		boom.geometry = new Geometry(mesh,position,rotation)
+		drawCyl(ComponentColors.fuselage,mesh,position,rotation)
+
+		horiz = new Object();
+		var mesh = new Mesh("liftSurf",horiz,varDict["b_h"],varDict["S_h"],varDict["lambda_h"])
+		var position = new Position(horiz,{x:boom.geometry.position.x.val+boom.geometry.mesh.h.val/2,y:boom.geometry.position.y.val,z:boom.geometry.position.z.val})
+		var rotation = fuselage.geometry.rotation;
+		horiz.geometry = new Geometry(mesh,position,rotation)
+		drawWing(ComponentColors.stabilizer,mesh,position,rotation);
+
+		vert = new Object();
+		var mesh = new Mesh("liftSurf",vert,varDict["b_v"],varDict["S_v"],varDict["lambda_v"])
+		var position = new Position(vert,{x:boom.geometry.position.x.val+boom.geometry.mesh.h.val/2,y:boom.geometry.position.y.val,z:boom.geometry.position.z.val+mesh.b.val/2})
+		var rotation = new Rotation(vert,{x:Math.PI/2,y:0,z:Math.PI/2})
+		horiz.geometry = new Geometry(mesh,position,rotation)
+		drawWing(ComponentColors.stabilizer,mesh,position,rotation);
+
+	}
+	prop = new Object();
+	var mesh = new Mesh("prop",prop,varDict["d_prop",varDict["shaft_len"])
+	var position = new Position(prop,{x:boom.geometry.position.x.val+boom.geometry.mesh.h.val/2,y:boom.geometry.position.y.val,z:boom.geometry.position.z.val+mesh.b.val/2})
+	var rotation = new Rotation(prop,{x:Math.PI/2,y:0,z:Math.PI/2})
+	horiz.geometry = new Geometry(mesh,position,rotation)
+	drawWing(ComponentColors.stabilizer,mesh,position,rotation);
+
 	// 	varDict["S"] = 10;
 	// varDict["b"] = 10;
 	// varDict["l_{fuel}"] = 3;
@@ -127,6 +165,10 @@ Mesh = function(){
 		this.b = new Variable("b"+parentObj.nameStr,arguments[2],"m")
 		this.S = new Variable("S"+parentObj.nameStr,arguments[3],"m")
 		this.lambda = new Variable("lambda"+parentObj.nameStr,arguments[4],"m")
+	}
+	if (type=="prop"){
+		this.d = new Variable("d"+parentObj.nameStr,arguments[2],"m")
+		this.shaftLen = new Variable("shaftLen"+parentObj.nameStr,arguments[3],"m")
 	}
 }
 
@@ -221,8 +263,8 @@ drawCyl = function(color,mesh,position,rotation){
 
 drawHemi = function(color,mesh,position,rotation){
 	//Make spinner
-	var geometry = new THREE.SphereGeometry( mesh.d.val*0.5, 10, 10, Math.PI, Math.PI, 3*Math.PI/2);
-	var material = new THREE.MeshPhongMaterial( { color: color, wireframe:true} );
+	var geometry = new THREE.SphereGeometry( mesh.d.val*0.5, 100, 100, 2*Math.PI, 2*Math.PI, 3*Math.PI/2);
+	var material = new THREE.MeshBasicMaterial( { color: color, wireframe:false} );
 	var mesh = new THREE.Mesh( geometry, material );
 	mesh.position.set(position.x.val,position.y.val,position.z.val)
 	mesh.rotation.set(rotation.x.val,rotation.y.val,rotation.z.val)
@@ -235,25 +277,11 @@ drawHemi = function(color,mesh,position,rotation){
 }
 
 drawWing = function(color,mesh,position,rotation){
-	//Inputs are color, then mesh, position,rotation
-	//Returns the rectangle object drawn, for reference by others
-	//Need to puull a chord out of the aspect ratio and S
-	// span = Math.pow(mesh.S.val*mesh.lambda.val,0.5)
-	// meanChord = mesh.b.val*mesh.lambda.val
-	// thickness = 0.03*meanChord
-	// geometry = new THREE.BoxGeometry( meanChord, mesh.b.val,thickness);
-	// material = new THREE.MeshPhongMaterial( { color: color} );
-	// mesh = new THREE.Mesh( geometry, material );
-	// mesh.position.set(position.x.val,position.y.val,position.z.val)
-	// mesh.rotation.set(rotation.x.val,rotation.y.val,rotation.z.val)
-	// mesh.castShadow = true;
-	// mesh.receiveShadow = true;
-	// geometry.dynamic = true
-	// scene.add( mesh );
-	// return mesh;
-	halfSpan = 15
-	tipHalfChord = 3
-	rootHalfChord = 4
+	halfSpan = mesh.b.val/2
+	midChord = mesh.S.val/Math.pow(mesh.b.val,1)
+	tipHalfChord = midChord/(mesh.lambda.val)
+	rootHalfChord = midChord*(mesh.lambda.val)
+
 	var extrudeSettings = {
 				curveSegments	: 100,
 				steps			: 200,
@@ -279,8 +307,55 @@ drawWing = function(color,mesh,position,rotation){
 	var material = new THREE.MeshLambertMaterial( { color: ComponentColors.wing, wireframe: false } );
 	var mesh = new THREE.Mesh( geometry, material );
 	mesh.rotation.set(rotation.x.val,rotation.y.val,rotation.z.val)
-
+	mesh.position.set(position.x.val,position.y.val,position.z.val)
 	scene.add( mesh );
+}
+
+drawProp = function(color,mesh,position,rotation){
+	// 	//Make propellers
+	aoa = 10
+	diameter = 0.2
+	shaftRadius = mesh.d.val*0.01
+	shaftLen = mesh.shaftLen.val
+	chord = diameter*0.03
+	thicknessToChordRatio = 0.1 //Thickness to chord ratio
+	thickness = chord*thicknessToChordRatio
+
+	// //Make shaft
+	//Geometry
+	propShaft = new Object();
+	var mesh = new Mesh("cyl",propShaft,varDict["d_prop"],varDict["shaft_len"])
+	var position = new Position(propShaft,{x:varDict["fuse_len"],y:0,z:0})
+	var rotation = new Rotation(propShaft,{x:0,y:0,z:Math.PI/2})
+	propShaft.geometry = new Geometry(mesh,position,rotation)
+	drawCyl(ComponentColors.propellers,fuselage.geometry.mesh,fuselage.geometry.position,fuselage.geometry.rotation)
+	propShaft.rotateX(Math.radians(90))
+	propShaft.position.set(motorCyl.position.x,motorCyl.position.y,motorHeight+shaftLen/2)
+	scene.add( propShaft );
+	
+	// //Make blade
+	// for(var j=0; j<2;j++){
+	// 	bladeRect = drawBoxOld(ComponentColors.propellers,chord,diameter/2,thickness)
+		
+	// 	if(j==0){
+	// 		flp=-1;
+	// 	}
+	// 	else{
+	// 		flp =1;
+	// 	}
+	// 	bladeRect.rotateY(Math.radians(flp*aoa))
+	// 	bladeRect.position.set(propShaft.position.x,propShaft.position.y+flp*diameter/4,propShaft.position.z+shaftLen/2);
+	// 	scene.add( bladeRect );
+
+	// }
+	// //Make spinner
+	// var geometry = new THREE.SphereGeometry( shaftRadius*1.5, 10, 10, Math.PI, Math.PI, 3*Math.PI/2);
+	// var material = new THREE.MeshPhongMaterial( { color: ComponentColors.propellers} );
+	// spinnerHemi = new THREE.Mesh( geometry, material );
+	// spinnerHemi.material.side = THREE.DoubleSide;
+	// spinnerHemi.rotateX(Math.radians(90))
+	// spinnerHemi.position.set(propShaft.position.x,propShaft.position.y,propShaft.position.z+shaftLen*0.5)
+	// scene.add( spinnerHemi );
 
 
 }
@@ -505,6 +580,7 @@ function onWindowResize() {
 }
 function animate() {
 	requestAnimationFrame( animate );
+
 	controls.update();
 }
 function render() {
