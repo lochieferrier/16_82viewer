@@ -123,12 +123,12 @@ function updateRendering(varDict){
 		drawWing(ComponentColors.stabilizer,mesh,position,rotation);
 
 	}
-	prop = new Object();
-	var mesh = new Mesh("prop",prop,varDict["d_prop",varDict["shaft_len"])
-	var position = new Position(prop,{x:boom.geometry.position.x.val+boom.geometry.mesh.h.val/2,y:boom.geometry.position.y.val,z:boom.geometry.position.z.val+mesh.b.val/2})
-	var rotation = new Rotation(prop,{x:Math.PI/2,y:0,z:Math.PI/2})
-	horiz.geometry = new Geometry(mesh,position,rotation)
-	drawWing(ComponentColors.stabilizer,mesh,position,rotation);
+	// prop = new Object();
+	// var mesh = new Mesh("prop",prop,varDict["d_prop"],varDict["shaft_len"])
+	// var position = new Position(prop,{x:boom.geometry.position.x.val+boom.geometry.mesh.h.val/2,y:boom.geometry.position.y.val,z:boom.geometry.position.z.val})
+	// var rotation = new Rotation(prop,{x:Math.PI/2,y:0,z:Math.PI/2})
+	// horiz.geometry = new Geometry(mesh,position,rotation)
+	// drawWing(ComponentColors.stabilizer,mesh,position,rotation);
 
 	// 	varDict["S"] = 10;
 	// varDict["b"] = 10;
