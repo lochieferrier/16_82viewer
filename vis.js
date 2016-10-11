@@ -33,13 +33,34 @@ function handleFileSelect_csv(evt) {
         {
         	var contents = event.target.result
         	console.log(contents)
+        	parsedData = Papa.parse(contents)
+        	var varDict = new Object();
+        	varDict = getDummyDict();
+			for (var i = 0; i < parsedData.data.length; i ++){
+			  dataLine =parsedData.data[i]
+			  console.log(dataLine)
+			  // if (dataLine[0] == "d"){
+			  	varDict[dataLine[0]] = parseFloat(dataLine[1])
+			 }
+        	// varDict = getDummyDict();
+
+        	//Add some constants
+        	//Constants used to draw something really
+			varDict["tailBoomAR"] = 20;
+			varDict["lambda_h"] = 1;
+			varDict["lambda_v"] = 1;
+			// varDict["shaft_len"] = 1;
+			// varDict["d_prop"] = 5;
+
+        	console.log(varDict)
+        	console.log(getDummyDict())
+    		updateRendering(varDict);
      	}
         reader.readAsText(f);
     }
     document.getElementById('files_csv').addEventListener('change', handleFileSelect_csv, false);
 
-	varDict = getDummyDict();
-    updateRendering(varDict);
+	
 }
 function getDummyDict(){
 	var varDict = new Object();
@@ -53,7 +74,7 @@ function getDummyDict(){
 	varDict["b_h"] = 4;
 	varDict["b_v"] = 5;
 	varDict["lambda"] = 2;
-	varDict["t_sep/d"] = 2.5;
+	varDict["eta"] = 2.5;
 	varDict["fuse_len"] = 10;
 
 	//Constants used to draw something really
@@ -66,11 +87,12 @@ function getDummyDict(){
 }
 
 function updateRendering(varDict){
-	console.log(varDict)
-
+	
+	init();
+  	
 	//Geometry
 	fuselage = new Object();
-	var mesh = new Mesh("cyl",fuselage,varDict["d"],varDict["fuse_len"])
+	var mesh = new Mesh("cyl",fuselage,varDict["d"],varDict["l_{fuel}"])
 	var position = new Position(fuselage,{x:varDict["fuse_len"]/2,y:0,z:0})
 	var rotation = new Rotation(fuselage,{x:0,y:0,z:Math.PI/2})
 	fuselage.geometry = new Geometry(mesh,position,rotation)
@@ -78,14 +100,14 @@ function updateRendering(varDict){
 	
 	frontCap = new Object();
 	var mesh = new Mesh("hemi",frontCap,varDict["d"])
-	var position = new Position(frontCap,{x:fuselage.geometry.position.x.val + varDict["fuse_len"]*0.5,y:0,z:0})
+	var position = new Position(frontCap,{x:fuselage.geometry.position.x.val + varDict["l_{fuel}"]*0.5,y:0,z:0})
 	var rotation = new Rotation(frontCap,{x:0,y:0,z:-Math.PI/2})
 	frontCap.geometry = new Geometry(mesh,position,rotation)
 	drawHemi(ComponentColors.fuselage,frontCap.geometry.mesh,frontCap.geometry.position,frontCap.geometry.rotation)
 
 	rearCap = new Object();
 	var mesh = new Mesh("hemi",frontCap,varDict["d"])
-	var position = new Position(frontCap,{x:fuselage.geometry.position.x.val-varDict["fuse_len"]*0.5,y:0,z:0})
+	var position = new Position(frontCap,{x:fuselage.geometry.position.x.val-varDict["l_{fuel}"]*0.5,y:0,z:0})
 	var rotation = new Rotation(frontCap,{x:0,y:0,z:Math.PI/2})
 	frontCap.geometry = new Geometry(mesh,position,rotation)
 	drawHemi(ComponentColors.fuselage,frontCap.geometry.mesh,frontCap.geometry.position,frontCap.geometry.rotation)
@@ -103,7 +125,7 @@ function updateRendering(varDict){
 	for (var i = -1; i < 2; i = i+2){
 		boom = new Object();
 		var mesh = new Mesh("cyl",boom,varDict["L"]/varDict["tailBoomAR"],varDict["L"])
-		var position = new Position(boom,{x:varDict["fuse_len"]/2+varDict["L"]/2,y:i*varDict["t_sep/d"]*varDict["d"]*0.5,z:fuselage.geometry.mesh.d.val/2})
+		var position = new Position(boom,{x:varDict["fuse_len"]/2+varDict["L"]/2,y:i*varDict["eta"]*varDict["d"]*0.5,z:fuselage.geometry.mesh.d.val/2})
 		var rotation = fuselage.geometry.rotation;
 		boom.geometry = new Geometry(mesh,position,rotation)
 		drawCyl(ComponentColors.fuselage,mesh,position,rotation)
@@ -142,6 +164,8 @@ function updateRendering(varDict){
 	// varDict["lambda"] = 0.5;
 	// varDict["t_sep/d"] = 3;
 	// varDict["fuse_len"] = 10;
+	render();
+	animate();
 }
 
 Mesh = function(){
@@ -278,9 +302,10 @@ drawHemi = function(color,mesh,position,rotation){
 
 drawWing = function(color,mesh,position,rotation){
 	halfSpan = mesh.b.val/2
-	midChord = mesh.S.val/Math.pow(mesh.b.val,1)
-	tipHalfChord = midChord/(mesh.lambda.val)
-	rootHalfChord = midChord*(mesh.lambda.val)
+	// midChord = mesh.S.val/Math.pow(mesh.b.val,1)
+	rootHalfChord = mesh.S.val/(mesh.b.val*(1+mesh.lambda.val));
+	tipHalfChord = mesh.lambda.val*rootHalfChord;
+
 
 	var extrudeSettings = {
 				curveSegments	: 100,
@@ -517,8 +542,7 @@ $(document).ready(function(){
 	
   // updateRendering(getDummyDict())
   document.getElementById('files_csv').addEventListener('change', handleFileSelect_csv, false);
-  init();
-  animate();
+  
 
 });
 
@@ -567,7 +591,7 @@ function init() {
 	//
 	window.addEventListener( 'resize', onWindowResize, false );
 	//
-	updateRendering(getDummyDict());
+	// updateRendering(getDummyDict());
 
 	render();
 }
