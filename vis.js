@@ -1,4 +1,5 @@
 var Colors = {
+	//Colorscheme from
 	//https://coolors.co/app/0a122a-274c77-6096ba-a3cef1-cdd6dd
 	maastricht:0x0A122A,
 	stpatricks:0x274c77,
@@ -16,19 +17,16 @@ var ComponentColors = {
 	propellers:Colors.silverlake
 }
 
-
-
 function handleFileSelect_csv(evt) {
+    
     var files = evt.target.files; // FileList object
   	var varDict = new Object();
 
     // files is a FileList of File objects. List some properties.
     var output = [];
-    console.log('reading file')
+    
     for (var i = 0, f; f = files[i]; i++) {
-    	console.log(files)
        var reader = new FileReader();
-
         reader.onload = function(event)
         {
         	var contents = event.target.result
@@ -39,29 +37,25 @@ function handleFileSelect_csv(evt) {
 			for (var i = 0; i < parsedData.data.length; i ++){
 			  dataLine =parsedData.data[i]
 			  console.log(dataLine)
-			  // if (dataLine[0] == "d"){
+			  if (dataLine[0]!= ''){
 			  	varDict[dataLine[0]] = parseFloat(dataLine[1])
+			  }
 			 }
-        	// varDict = getDummyDict();
 
-        	//Add some constants
-        	//Constants used to draw something really
+        	//Add some constants that are not set by csv
 			varDict["tailBoomAR"] = 20;
 			varDict["lambda_h"] = 1;
 			varDict["lambda_v"] = 1;
-			// varDict["shaft_len"] = 1;
-			// varDict["d_prop"] = 5;
 
         	console.log(varDict)
-        	console.log(getDummyDict())
     		updateRendering(varDict);
+     	
      	}
         reader.readAsText(f);
     }
     document.getElementById('files_csv').addEventListener('change', handleFileSelect_csv, false);
-
-	
 }
+
 function getDummyDict(){
 	var varDict = new Object();
 	varDict["S"] = 20;
@@ -143,29 +137,26 @@ function updateRendering(varDict){
 		var rotation = new Rotation(vert,{x:Math.PI/2,y:0,z:Math.PI/2})
 		horiz.geometry = new Geometry(mesh,position,rotation)
 		drawWing(ComponentColors.stabilizer,mesh,position,rotation);
-
 	}
+
 	// prop = new Object();
 	// var mesh = new Mesh("prop",prop,varDict["d_prop"],varDict["shaft_len"])
 	// var position = new Position(prop,{x:boom.geometry.position.x.val+boom.geometry.mesh.h.val/2,y:boom.geometry.position.y.val,z:boom.geometry.position.z.val})
 	// var rotation = new Rotation(prop,{x:Math.PI/2,y:0,z:Math.PI/2})
 	// horiz.geometry = new Geometry(mesh,position,rotation)
 	// drawWing(ComponentColors.stabilizer,mesh,position,rotation);
-
-	// 	varDict["S"] = 10;
-	// varDict["b"] = 10;
-	// varDict["l_{fuel}"] = 3;
-	// varDict["d"] = 4;
-	// varDict["L"] = 10; //gonna guess this is fuselage length
-	// varDict["S_h"] = 3;
-	// varDict["S_v"] = 4;
-	// varDict["b_h"] = 4;
-	// varDict["b_v"] = 5;
-	// varDict["lambda"] = 0.5;
-	// varDict["t_sep/d"] = 3;
-	// varDict["fuse_len"] = 10;
+	renderVarDict(varDict)
 	render();
 	animate();
+}
+
+renderVarDict = function(varDict){
+	varDictStr = ""
+	for (var varKey in varDict){
+		variable = varDict[varKey]
+		varDictStr = varDictStr + '<li>'+varKey+' : '+variable+'</li>' 
+	}
+	$('#varDictView').html(varDictStr)
 }
 
 Mesh = function(){
@@ -245,8 +236,6 @@ Geometry = function(mesh,position,rotation){
 	}
 	this.getConstraints = function(){
 		var constraints = []
-		// constraints.push.apply(constraints,this.mesh.getConstraints())
-		// console.log(this.matesArr)
 		for(var i = 0; i<this.matesArr.length; i++){
 			constraints.push.apply(constraints,this.matesArr[i].getConstraints())
 		}
@@ -302,38 +291,33 @@ drawHemi = function(color,mesh,position,rotation){
 
 drawWing = function(color,mesh,position,rotation){
 	halfSpan = mesh.b.val/2
-	// midChord = mesh.S.val/Math.pow(mesh.b.val,1)
 	rootHalfChord = mesh.S.val/(mesh.b.val*(1+mesh.lambda.val));
 	tipHalfChord = mesh.lambda.val*rootHalfChord;
-
 
 	var extrudeSettings = {
 				curveSegments	: 100,
 				steps			: 200,
 				bevelEnabled	: false,
-				// bevelEnabled	: true,
-				// bevelThickness	: 0.0,
 				amount			: rootHalfChord*0.2
 	};
 	
-	var pts = 
-                [
+	var pts = [
                  new THREE.Vector2(halfSpan,tipHalfChord),
                  new THREE.Vector2(halfSpan,-tipHalfChord),
                  new THREE.Vector2(0,-rootHalfChord),
                  new THREE.Vector2(-halfSpan,-tipHalfChord),
                  new THREE.Vector2(-halfSpan,tipHalfChord),
                  new THREE.Vector2(0,rootHalfChord)
-                 // new THREE.Vector2(halfSpan,tipHalfChord)
-				 ];
+              ];
+
 	var shape = new THREE.Shape(pts);
 	var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
-	
 	var material = new THREE.MeshLambertMaterial( { color: ComponentColors.wing, wireframe: false } );
 	var mesh = new THREE.Mesh( geometry, material );
 	mesh.rotation.set(rotation.x.val,rotation.y.val,rotation.z.val)
 	mesh.position.set(position.x.val,position.y.val,position.z.val)
 	scene.add( mesh );
+
 }
 
 drawProp = function(color,mesh,position,rotation){
@@ -357,32 +341,66 @@ drawProp = function(color,mesh,position,rotation){
 	propShaft.rotateX(Math.radians(90))
 	propShaft.position.set(motorCyl.position.x,motorCyl.position.y,motorHeight+shaftLen/2)
 	scene.add( propShaft );
+
+
+}
+
+$(document).ready(function(){
 	
-	// //Make blade
-	// for(var j=0; j<2;j++){
-	// 	bladeRect = drawBoxOld(ComponentColors.propellers,chord,diameter/2,thickness)
-		
-	// 	if(j==0){
-	// 		flp=-1;
-	// 	}
-	// 	else{
-	// 		flp =1;
-	// 	}
-	// 	bladeRect.rotateY(Math.radians(flp*aoa))
-	// 	bladeRect.position.set(propShaft.position.x,propShaft.position.y+flp*diameter/4,propShaft.position.z+shaftLen/2);
-	// 	scene.add( bladeRect );
+  document.getElementById('files_csv').addEventListener('change', handleFileSelect_csv, false);
 
-	// }
-	// //Make spinner
-	// var geometry = new THREE.SphereGeometry( shaftRadius*1.5, 10, 10, Math.PI, Math.PI, 3*Math.PI/2);
-	// var material = new THREE.MeshPhongMaterial( { color: ComponentColors.propellers} );
-	// spinnerHemi = new THREE.Mesh( geometry, material );
-	// spinnerHemi.material.side = THREE.DoubleSide;
-	// spinnerHemi.rotateX(Math.radians(90))
-	// spinnerHemi.position.set(propShaft.position.x,propShaft.position.y,propShaft.position.z+shaftLen*0.5)
-	// scene.add( spinnerHemi );
+});
 
+var container
+var camera, controls, scene, renderer;
+var cross;
 
+function init() {
+	camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+	camera.position.z = 50;
+	controls = new THREE.TrackballControls( camera );
+	controls.rotateSpeed = 1.0;
+	controls.zoomSpeed = 1.2;
+	controls.panSpeed = 0.8;
+	controls.noZoom = false;
+	controls.noPan = false;
+	controls.staticMoving = true;
+	controls.dynamicDampingFactor = 0.3;
+	controls.keys = [ 65, 83, 68 ];
+	controls.addEventListener( 'change', render );
+	// world
+	scene = new THREE.Scene();
+	scene.fog = new THREE.FogExp2( 0xdddddd, 0.002 );
+
+	createLights()
+	renderer = new THREE.WebGLRenderer( { antialias: false } );
+	renderer.setClearColor( scene.fog.color );
+	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.setSize( window.innerWidth, window.innerHeight/1.5 );
+	container = document.getElementById('threedview');
+	container.appendChild( renderer.domElement );
+
+	window.addEventListener( 'resize', onWindowResize, true );
+
+	render();
+}
+
+function onWindowResize() {
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	controls.handleResize();
+	render();
+}
+
+function animate() {
+	requestAnimationFrame( animate );
+
+	controls.update();
+}
+
+function render() {
+	renderer.render( scene, camera );
 }
 
 drawFoil = function(){
@@ -538,148 +556,6 @@ drawFoil = function(){
 	scene.add( mesh );
 }
 
-$(document).ready(function(){
-	
-  // updateRendering(getDummyDict())
-  document.getElementById('files_csv').addEventListener('change', handleFileSelect_csv, false);
-  
-
-});
-
-// if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
-var container
-var camera, controls, scene, renderer;
-var cross;
-
-function init() {
-	camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
-	camera.position.z = 50;
-	controls = new THREE.TrackballControls( camera );
-	controls.rotateSpeed = 1.0;
-	controls.zoomSpeed = 1.2;
-	controls.panSpeed = 0.8;
-	controls.noZoom = false;
-	controls.noPan = false;
-	controls.staticMoving = true;
-	controls.dynamicDampingFactor = 0.3;
-	controls.keys = [ 65, 83, 68 ];
-	controls.addEventListener( 'change', render );
-	// world
-	scene = new THREE.Scene();
-	scene.fog = new THREE.FogExp2( 0xdddddd, 0.002 );
-	
-	
-	// // lights
-	// light = new THREE.DirectionalLight( 0xffffff );
-	// light.position.set( 1, 1, 1 );
-	// scene.add( light );
-	// light = new THREE.DirectionalLight( 0xffffff );
-	// light.position.set( -1, -1, -1 );
-	// scene.add( light );
-	// light = new THREE.AmbientLight( 0xffffff );
-	// scene.add( light );
-	// renderer
-	createLights()
-	renderer = new THREE.WebGLRenderer( { antialias: false } );
-	renderer.setClearColor( scene.fog.color );
-	renderer.setPixelRatio( window.devicePixelRatio );
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	container = document.getElementById('threedview');
-	container.appendChild( renderer.domElement );
-	// stats = new Stats();
-	// container.appendChild( stats.dom );
-	//
-	window.addEventListener( 'resize', onWindowResize, false );
-	//
-	// updateRendering(getDummyDict());
-
-	render();
-}
-function onWindowResize() {
-	camera.aspect = window.innerWidth / window.innerHeight;
-	camera.updateProjectionMatrix();
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	controls.handleResize();
-	render();
-}
-function animate() {
-	requestAnimationFrame( animate );
-
-	controls.update();
-}
-function render() {
-	renderer.render( scene, camera );
-	// stats.update();
-}
-
-
-// var camera, scene, renderer;
-// 	var container, stats;
-// 	var cube, plane;
-
-// setup3D = function(componentsArr,n_rotors){
-
-// 	// createScene();
-// 	// createLights();
-// 	// drawBoxOld('#ffccff',0,0,0,0,0,0)
-	
-// 	// console.log(componentsArr)
-// 	// for(var i=0;i<componentsArr.length;i++){
-// 	// 	drawComponent(componentsArr[i])
-// 	// }
-// 	// drawQuad();
-// 	// createArm();
-// 	// createBattery();
-// 	// createSpeedController();
-// 	// createMotor();
-// 	// createPropeller();
-
-// 	// / create the camera
-// 	camera = new THREE.Camera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
-// 	camera.position.y = 0;
-// 	camera.position.z = 0;
-// 	camera.position.y = 0;
-// 	// create the Scene
-// 	scene = new THREE.Scene();
-// 	// create the Cube
-// 	cube = new THREE.Mesh( new THREE.CubeGeometry( 200, 200, 200 ), new THREE.MeshNormalMaterial() );
-// 	cube.position.y = 0;
-// 	// add the object to the scene
-// 	scene.add(cube);
-// 	// create the container element
-// 	container = document.createElement( 'div' );
-// 	document.body.appendChild( container );
-
-// 	// init the WebGL renderer and append it to the Dom
-// 	renderer = new THREE.WebGLRenderer();
-// 	renderer.setSize( window.innerWidth, window.innerHeight );
-// 	container.appendChild( renderer.domElement );
-// 	render()
-// }
-// function animate() {
-// 				// render the 3D scene
-// 				render();
-// 				// relaunch the 'timer' 
-// 				requestAnimationFrame( animate );
-// 				// update the Stats element
-// 				// stats.update();
-// 			}
-// /**
-//  * Render the 3D scene
-// */
-// function render() {
-// 	// animate the cube
-// 	// cube.rotation.x += 0.02;
-// 	// cube.rotation.y += 0.0225;
-// 	// cube.rotation.z += 0.0175;
-// 	// // make the cube bounce
-// 	// var dtime	= Date.now() - startTime;
-// 	// cube.scale.x	= 1.0 + 0.3*Math.sin(dtime/300);
-// 	// cube.scale.y	= 1.0 + 0.3*Math.sin(dtime/300);
-// 	// cube.scale.z	= 1.0 + 0.3*Math.sin(dtime/300);
-// 	// actually display the scene in the Dom element
-// 	renderer.render( scene, camera );
-// }
 function createLights() {
 	// A hemisphere light is a gradient colored light; 
 	// the first parameter is the sky color, the second parameter is the ground color, 
@@ -712,26 +588,4 @@ function createLights() {
 	// to activate the lights, just add them to the scene
 	scene.add(hemisphereLight);  
 	scene.add(shadowLight);
-}
-
-
-drawBoxOld = function(){
-	//Inputs are color, then x,y,z dims, then x,y,z positioning, then rotation
-	//Returns the rectangle object drawn, for reference by others
-	geometry = new THREE.BoxGeometry( arguments[1], arguments[2],arguments[3]);
-	material = new THREE.MeshPhongMaterial( { color: arguments[0],wireframe:false} );
-	mesh = new THREE.Mesh( geometry, material );
-	
-	if(arguments.length > 4){
-		mesh.position.set(arguments[4],arguments[5],arguments[6])
-	}
-	if(arguments.length > 7){
-		mesh.rotation.set(arguments[7],arguments[8],arguments[9])
-	}
-	mesh.castShadow = true;
-	mesh.receiveShadow = true;
-	geometry.dynamic = true
-	scene.add( mesh );
-	console.log(mesh)
-	return mesh;
 }
