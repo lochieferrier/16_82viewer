@@ -16,7 +16,7 @@ var ComponentColors = {
 	wing:Colors.silverlake,
 	stabilizer:Colors.maastricht,
 	esc:Colors.bbyblue,
-	motor:Colors.bbyblue,
+	motor:'#ff0000',
 	propellers:Colors.silverlake
 }
 
@@ -109,7 +109,13 @@ function updateRendering(varDict){
 	frontCap.geometry = new Geometry(mesh,position,rotation)
 	drawHemi(ComponentColors.fuselage,frontCap.geometry.mesh,frontCap.geometry.position,frontCap.geometry.rotation)
 
-	
+	cgSphere = new Object();
+	var mesh = new Mesh("cyl",cgSphere,varDict["d"]*0.1,varDict["d"]*0.05)
+	var position = new Position(cgSphere,{x:varDict["x_{cg}"]+fuselage.geometry.mesh.h.val,y:0,z:fuselage.geometry.mesh.d.val/1.5})
+	var rotation = new Rotation(cgSphere,{x:0,y:0,z:Math.PI/2})
+	cgSphere.geometry = new Geometry(mesh,position,rotation)
+	drawCyl(ComponentColors.motor,cgSphere.geometry.mesh,cgSphere.geometry.position,cgSphere.geometry.rotation)
+
 	wing = new Object();
 	//syntax is span, aspect ratio, S
 	var mesh = new Mesh("liftSurf",wing,varDict["b"],varDict["S"],varDict["lambda"])
@@ -389,7 +395,7 @@ var cross;
 
 function init() {
 	camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
-	camera.position.z = 50;
+	camera.position.z = 40;
 	controls = new THREE.TrackballControls( camera );
 	controls.rotateSpeed = 1.0;
 	controls.zoomSpeed = 1.2;
