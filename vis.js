@@ -1,3 +1,6 @@
+// Select what type of tail you want to draw, either pi or dual
+tailOption = "pi"
+
 var Colors = {
 	//Colorscheme from
 	//https://coolors.co/app/0a122a-274c77-6096ba-a3cef1-cdd6dd
@@ -114,31 +117,60 @@ function updateRendering(varDict){
 	var rotation = fuselage.geometry.rotation
 	wing.geometry = new Geometry(mesh,position,rotation)
 	drawWing(ComponentColors.wing,wing.geometry.mesh,wing.geometry.position,wing.geometry.rotation)
+	if (tailOption == "dual"){
+		//Draw tails -1 is left when viewed from rear, +1 is right
+		for (var i = -1; i < 2; i = i+2){
+			boom = new Object();
+			var mesh = new Mesh("cyl",boom,varDict["L"]/varDict["tailBoomAR"],varDict["L"])
+			var position = new Position(boom,{x:varDict["fuse_len"]/2+varDict["L"]/2,y:i*varDict["eta"]*varDict["d"]*0.5,z:fuselage.geometry.mesh.d.val/2})
+			var rotation = fuselage.geometry.rotation;
+			boom.geometry = new Geometry(mesh,position,rotation)
+			drawCyl(ComponentColors.fuselage,mesh,position,rotation)
 
-	//Draw tails -1 is left when viewed from rear, +1 is right
-	for (var i = -1; i < 2; i = i+2){
-		boom = new Object();
-		var mesh = new Mesh("cyl",boom,varDict["L"]/varDict["tailBoomAR"],varDict["L"])
-		var position = new Position(boom,{x:varDict["fuse_len"]/2+varDict["L"]/2,y:i*varDict["eta"]*varDict["d"]*0.5,z:fuselage.geometry.mesh.d.val/2})
-		var rotation = fuselage.geometry.rotation;
-		boom.geometry = new Geometry(mesh,position,rotation)
-		drawCyl(ComponentColors.fuselage,mesh,position,rotation)
+			horiz = new Object();
+			var mesh = new Mesh("liftSurf",horiz,varDict["b_h"],varDict["S_h"],varDict["lambda_h"])
+			var position = new Position(horiz,{x:boom.geometry.position.x.val+boom.geometry.mesh.h.val/2,y:boom.geometry.position.y.val,z:boom.geometry.position.z.val})
+			var rotation = fuselage.geometry.rotation;
+			horiz.geometry = new Geometry(mesh,position,rotation)
+			drawWing(ComponentColors.stabilizer,mesh,position,rotation);
 
-		horiz = new Object();
-		var mesh = new Mesh("liftSurf",horiz,varDict["b_h"],varDict["S_h"],varDict["lambda_h"])
-		var position = new Position(horiz,{x:boom.geometry.position.x.val+boom.geometry.mesh.h.val/2,y:boom.geometry.position.y.val,z:boom.geometry.position.z.val})
-		var rotation = fuselage.geometry.rotation;
-		horiz.geometry = new Geometry(mesh,position,rotation)
-		drawWing(ComponentColors.stabilizer,mesh,position,rotation);
-
-		vert = new Object();
-		var mesh = new Mesh("liftSurf",vert,varDict["b_v"],varDict["S_v"],varDict["lambda_v"])
-		var position = new Position(vert,{x:boom.geometry.position.x.val+boom.geometry.mesh.h.val/2,y:boom.geometry.position.y.val,z:boom.geometry.position.z.val+mesh.b.val/2})
-		var rotation = new Rotation(vert,{x:Math.PI/2,y:0,z:Math.PI/2})
-		horiz.geometry = new Geometry(mesh,position,rotation)
-		drawWing(ComponentColors.stabilizer,mesh,position,rotation);
+			vert = new Object();
+			var mesh = new Mesh("liftSurf",vert,varDict["b_v"],varDict["S_v"],varDict["lambda_v"])
+			var position = new Position(vert,{x:boom.geometry.position.x.val+boom.geometry.mesh.h.val/2,y:boom.geometry.position.y.val,z:boom.geometry.position.z.val+mesh.b.val/2})
+			var rotation = new Rotation(vert,{x:Math.PI/2,y:0,z:Math.PI/2})
+			horiz.geometry = new Geometry(mesh,position,rotation)
+			drawWing(ComponentColors.stabilizer,mesh,position,rotation);
+		}
 	}
+	if (tailOption == "pi"){
+		//Draw tails -1 is left when viewed from rear, +1 is right
+		for (var i = -1; i < 2; i = i+2){
+			boom = new Object();
+			var mesh = new Mesh("cyl",boom,varDict["L"]/varDict["tailBoomAR"],varDict["L"])
+			var position = new Position(boom,{x:varDict["fuse_len"]/2+varDict["L"]/2,y:i*varDict["eta"]*varDict["d"]*0.5,z:fuselage.geometry.mesh.d.val/2})
+			var rotation = fuselage.geometry.rotation;
+			boom.geometry = new Geometry(mesh,position,rotation)
+			drawCyl(ComponentColors.fuselage,mesh,position,rotation)
 
+			vert = new Object();
+			var mesh = new Mesh("liftSurf",vert,varDict["b_v"],varDict["S_v"]/2,varDict["lambda_v"])
+			var position = new Position(vert,{x:boom.geometry.position.x.val+boom.geometry.mesh.h.val/2,y:boom.geometry.position.y.val,z:boom.geometry.position.z.val+mesh.b.val/2})
+			var rotation = new Rotation(vert,{x:Math.PI/2,y:0,z:Math.PI/2})
+			vert.geometry = new Geometry(mesh,position,rotation)
+			drawWing(ComponentColors.stabilizer,mesh,position,rotation);
+
+			horiz = new Object();
+			var mesh = new Mesh("liftSurf",horiz,varDict["b_h"],varDict["S_h"],varDict["lambda_h"])
+			var position = new Position(horiz,{x:boom.geometry.position.x.val+boom.geometry.mesh.h.val/2,y:fuselage.geometry.position.y.val,z:boom.geometry.position.z.val+vert.geometry.mesh.b.val})
+			var rotation = fuselage.geometry.rotation;
+			horiz.geometry = new Geometry(mesh,position,rotation)
+			drawWing(ComponentColors.stabilizer,mesh,position,rotation);
+
+
+
+		}
+
+	}
 	// prop = new Object();
 	// var mesh = new Mesh("prop",prop,varDict["d_prop"],varDict["shaft_len"])
 	// var position = new Position(prop,{x:boom.geometry.position.x.val+boom.geometry.mesh.h.val/2,y:boom.geometry.position.y.val,z:boom.geometry.position.z.val})
