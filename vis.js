@@ -83,7 +83,7 @@ function getDummyDict(){
 	varDict["shaft_len"] = 1;
 	varDict["d_prop"] = 5;
 	return varDict;
-	
+
 }
 
 function updateRendering(varDict){
@@ -118,6 +118,8 @@ function updateRendering(varDict){
 	var rotation = new Rotation(cgSphere,{x:0,y:0,z:Math.PI/2})
 	cgSphere.geometry = new Geometry(mesh,position,rotation)
 	drawCyl(ComponentColors.motor,cgSphere.geometry.mesh,cgSphere.geometry.position,cgSphere.geometry.rotation)
+
+	drawCone();
 
 	wing = new Object();
 	//syntax is span, aspect ratio, S
@@ -174,8 +176,6 @@ function updateRendering(varDict){
 			var rotation = fuselage.geometry.rotation;
 			horiz.geometry = new Geometry(mesh,position,rotation)
 			drawWing(ComponentColors.stabilizer,mesh,position,rotation);
-
-
 
 		}
 
@@ -328,6 +328,17 @@ drawHemi = function(color,mesh,position,rotation){
 	mesh.receiveShadow = true;
 	geometry.dynamic = true
 	scene.add( mesh );
+}
+
+drawCone = function(){
+	var points = [];
+	for ( var i = 0; i < 10; i ++ ) {
+		points.push( new THREE.Vector2( Math.sin( i * 0.2 ) * 10 + 5, ( i - 5 ) * 2 ) );
+	}
+	coneGeometry = new THREE.LatheGeometry( points );
+	var material = new THREE.MeshBasicMaterial( { color: 0xffff00, wireframe: true} );
+	var lathe = new THREE.Mesh( coneGeometry, material );
+	scene.add( lathe );
 }
 
 drawWing = function(color,mesh,position,rotation){
