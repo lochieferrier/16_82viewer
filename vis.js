@@ -1,7 +1,7 @@
 // Options
-tailOption = "dual"
+tailOption = "single"
 CSVFileURL = "http://localhost:8000/sketch_params.csv"
-
+wingThickness = 0.1
 
 // Internal global variables
 CENTERX = 0
@@ -134,7 +134,29 @@ function updateRendering(varDict){
 	var rotation = new Rotation(cgSphere,{x:0,y:0,z:Math.PI/2})
 	cgSphere.geometry = new Geometry(mesh,position,rotation)
 	drawCyl(0xFF0000,cgSphere.geometry.mesh,cgSphere.geometry.position,cgSphere.geometry.rotation)
+	if (tailOption== "single"){
+		boom = new Object();
+		var mesh = new Mesh("cyl",boom,varDict["d_0"]*0.0833333,varDict["l_Mission-Aircraft-Empennage-TailBoom"])
+		var position = new Position(boom,{x:varDict["l_Mission-Aircraft-Fuselage"]/2+varDict["l_Mission-Aircraft-Empennage-TailBoom"]/2,y:0,z:fuselage.geometry.mesh.d.val/2})
+		var rotation = fuselage.geometry.rotation;
+		boom.geometry = new Geometry(mesh,position,rotation)
+		drawCyl(ComponentColors.fuselage,mesh,position,rotation)
 
+		horiz = new Object();
+		var mesh = new Mesh("liftSurf",horiz,varDict["b_Mission-Aircraft-Empennage-HorizontalTail"],varDict["S_Mission-Aircraft-Empennage-HorizontalTail"],varDict["lambda_h"])
+		var position = new Position(horiz,{x:boom.geometry.position.x.val+boom.geometry.mesh.h.val/2,y:boom.geometry.position.y.val,z:boom.geometry.position.z.val})
+		var rotation = fuselage.geometry.rotation;
+		horiz.geometry = new Geometry(mesh,position,rotation)
+		drawWing(ComponentColors.stabilizer,mesh,position,rotation);
+
+		vert = new Object();
+		var mesh = new Mesh("liftSurf",vert,varDict["b_Mission-Aircraft-Empennage-VerticalTail"],varDict["S_Mission-Aircraft-Empennage-VerticalTail"],varDict["lambda_v"])
+		var position = new Position(vert,{x:boom.geometry.position.x.val+boom.geometry.mesh.h.val/2,y:boom.geometry.position.y.val,z:boom.geometry.position.z.val+mesh.b.val/2})
+		var rotation = new Rotation(vert,{x:Math.PI/2,y:0,z:Math.PI/2})
+		horiz.geometry = new Geometry(mesh,position,rotation)
+		drawWing(ComponentColors.stabilizer,mesh,position,rotation);
+
+	}
 	if (tailOption == "dual"){
 		//Draw tails -1 is left when viewed from rear, +1 is right
 		for (var i = -1; i < 2; i = i+2){
@@ -355,7 +377,7 @@ drawWing = function(color,mesh,position,rotation){
 				curveSegments	: 100,
 				steps			: 200,
 				bevelEnabled	: false,
-				amount			: rootHalfChord*0.2
+				amount			: rootHalfChord*wingThickness
 	};
 
 	var pts = [
