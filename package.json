@@ -1,0 +1,19 @@
+{
+  "name": "16_82viewer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "TrackballControls.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lochieferrier/16_82viewer.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lochieferrier/16_82viewer/issues"
+  },
+  "homepage": "https://github.com/lochieferrier/16_82viewer#readme"
+}

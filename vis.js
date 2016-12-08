@@ -3,6 +3,8 @@ tailOption = "dual"
 CENTERX = 0
 CENTERY = 0
 CENTERZ = 0
+CSVresult = ""
+
 var Colors = {
 	//Colorscheme from
 	//https://coolors.co/app/0a122a-274c77-6096ba-a3cef1-cdd6dd
@@ -35,7 +37,7 @@ function handleFileSelect_csv(evt) {
         reader.onload = function(event)
         {
         	var contents = event.target.result
-        	// console.log(contents)
+        	console.log(contents)
         	parsedData = Papa.parse(contents)
         	var varDict = new Object();
         	// varDict = getDummyDict();
@@ -55,31 +57,31 @@ function handleFileSelect_csv(evt) {
     document.getElementById('files_csv').addEventListener('change', handleFileSelect_csv, false);
 }
 
-// function getDummyDict(){
-// 	var varDict = new Object();
-// 	varDict["S_Mission, Aircraft, Wing"] = 20;
-// 	varDict["b_Mission, Aircraft, Wing"] = 30;
-// 	varDict["l_Mission, Aircraft, Fuselage"] = 3;
-// 	varDict["d_0"] = 4;
-// 	varDict["l_Mision, Aircraft, Empennage, TailBoom"] = 10;
-//     //length out to booms
-// 	varDict["S_Mission, Aircraft, Empennage, HorizontalTail"] = 5;
-// 	varDict["S_Mission, Aircraft, Empennage, VerticalTail"] = 4;
-// 	varDict["b_Mission, Aircraft, Empennage, HorizontalTail"] = 4;
-// 	varDict["b_Mission, Aircraft, Empennage, VerticalTail"] = 5;
-// 	varDict["lambda"] = 2;
-// 	varDict["eta"] = 2.5;
-// 	varDict["fuse_len"] = 10;
-//
-// 	//Constants used to draw something really
-// 	varDict["tailBoomAR"] = 20;
-// 	varDict["lambda_h"] = 1;
-// 	varDict["lambda_v"] = 1;
-// 	varDict["shaft_len"] = 1;
-// 	varDict["d_prop"] = 5;
-// 	return varDict;
-// }
-
+function getCSVDataFromNode(){
+	console.log('calling')
+	$.get( "http://localhost:8000/sketch_params.csv",function(msg) {
+		if (msg != CSVresult){
+			console.log('diff')
+			CSVresult = msg;
+			parsedData = Papa.parse(CSVresult)
+        	var varDict = new Object();
+        	// varDict = getDummyDict();
+			for (var i = 0; i < parsedData.data.length; i ++){
+			  dataLine =parsedData.data[i]
+			//   console.log(dataLine)
+			  if (dataLine[0]!= ''){
+			  	varDict[dataLine[0]] = parseFloat(dataLine[1])
+			  }
+			 }
+    		updateRendering(varDict);
+		}
+	});
+}
+function startLiveReload(){
+	window.setInterval(function(){
+		getCSVDataFromNode();
+	}, 500);
+}
 function updateRendering(varDict){
 	CENTERX = varDict["x_cg"]
 	createScene();
