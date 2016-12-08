@@ -8,7 +8,7 @@ CENTERX = 0
 CENTERY = 0
 CENTERZ = 0
 CSVresult = ""
-startLiveReload()
+
 var Colors = {
 	//Colorscheme from
 	//https://coolors.co/app/0a122a-274c77-6096ba-a3cef1-cdd6dd
