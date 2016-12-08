@@ -9,6 +9,9 @@ CENTERY = 0
 CENTERZ = 0
 CSVresult = ""
 
+//Disable caching
+$.ajaxSetup({ cache: false });
+
 var Colors = {
 	//Colorscheme from
 	//https://coolors.co/app/0a122a-274c77-6096ba-a3cef1-cdd6dd
@@ -64,7 +67,6 @@ function handleFileSelect_csv(evt) {
 function getCSVFromServer(){
 	console.log('calling')
 	$.get(CSVFileURL ,function(msg) {
-		console.log(msg)
 		if (msg != CSVresult){
 			console.log('diff')
 			CSVresult = msg;
