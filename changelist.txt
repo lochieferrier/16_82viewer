@@ -14,9 +14,7 @@ equal to the fuselage radius), and a length.
 
 I think what was also causing you confusion was the fact that the dummyDict was also present,
 as getDummyDict() was being called. I've commented that out, now only the data from the CSV
-is being included.
-
-Overall, bad communication on my part, I'm sorry about this, let me know if you need more help or further mods.
+is being included. Bad communication on my part, I'm sorry about this.
 
 Live reloading:
 The way I did this was to set up a simple python server to serve the csv file,
@@ -30,3 +28,5 @@ Process for using live reloading:
 - Click the button that says "Start live reload"
 - Save changes to the csv file you specify at the top of vis.js, and the changes
 should show up in the sketch
+
+Let me know if you need more stuff!
