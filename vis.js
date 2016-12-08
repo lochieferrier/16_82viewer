@@ -8,7 +8,7 @@ CENTERX = 0
 CENTERY = 0
 CENTERZ = 0
 CSVresult = ""
-
+startLiveReload()
 var Colors = {
 	//Colorscheme from
 	//https://coolors.co/app/0a122a-274c77-6096ba-a3cef1-cdd6dd
@@ -20,7 +20,7 @@ var Colors = {
 }
 
 var ComponentColors = {
-	fuselage:Colors.stpatricks,
+	fuselage:Colors.maastricht,
 	wing:Colors.silverlake,
 	stabilizer:Colors.maastricht,
 	esc:Colors.bbyblue,
@@ -97,28 +97,27 @@ function updateRendering(varDict){
 
 	//Geometry
 	fuselage = new Object();
-	var mesh = new Mesh("cyl",fuselage, varDict["R_Mission-Aircraft-Fuselage"]/2, varDict["l_Mission-Aircraft-Fuselage"])
+	var mesh = new Mesh("cyl",fuselage, varDict["R_Mission-Aircraft-Fuselage"]*2, varDict["l_Mission-Aircraft-Fuselage"])
 	var position = new Position(fuselage,{x:varDict["l_Mission-Aircraft-Fuselage"]/2,y:0,z:0})
 	var rotation = new Rotation(fuselage,{x:0,y:0,z:Math.PI/2})
 	fuselage.geometry = new Geometry(mesh,position,rotation)
 	drawCyl(ComponentColors.fuselage,fuselage.geometry.mesh,fuselage.geometry.position,fuselage.geometry.rotation)
 	// console.log('drew fuselage')
 
-	frontCap = new Object();
-	var mesh = new Mesh("hemi",frontCap,varDict["R_Mission-Aircraft-Fuselage"]/2)
-	var position = new Position(frontCap,{x:fuselage.geometry.position.x.val + varDict["l_Mission-Aircraft-Fuselage"]*0.5,y:0,z:0})
-	var rotation = new Rotation(frontCap,{x:0,y:0,z:-Math.PI/2})
-	frontCap.geometry = new Geometry(mesh,position,rotation)
-	drawHemi(ComponentColors.fuselage,frontCap.geometry.mesh,frontCap.geometry.position,frontCap.geometry.rotation)
-	// console.log('drew front cap')
 
-	rearCap = new Object();
-	var mesh = new Mesh("hemi",frontCap,varDict["R_Mission-Aircraft-Fuselage"]/2)
-	var position = new Position(frontCap,{x:fuselage.geometry.position.x.val-varDict["l_Mission-Aircraft-Fuselage"]*0.5,y:0,z:0})
-	var rotation = new Rotation(frontCap,{x:0,y:0,z:Math.PI/2})
-	frontCap.geometry = new Geometry(mesh,position,rotation)
-	drawHemi(ComponentColors.fuselage,frontCap.geometry.mesh,frontCap.geometry.position,frontCap.geometry.rotation)
-	// console.log('drew last')
+	frontEllipse = new Object();
+	var mesh = new Mesh("ellipse",frontEllipse,varDict["R_Mission-Aircraft-Fuselage"],varDict["front_ellipse_length"])
+	var position = new Position(frontEllipse,{x:fuselage.geometry.position.x.val - varDict["l_Mission-Aircraft-Fuselage"]*0.5,y:0,z:0})
+	var rotation = new Rotation(frontEllipse,{x:0,y:0,z:Math.PI/2})
+	frontEllipse.geometry = new Geometry(mesh,position,rotation)
+	drawEllipse(ComponentColors.fuselage,frontEllipse.geometry.mesh,frontEllipse.geometry.position,frontEllipse.geometry.rotation)
+
+	rearEllipse = new Object();
+	var mesh = new Mesh("ellipse",rearEllipse,varDict["R_Mission-Aircraft-Fuselage"],varDict["rear_ellipse_length"])
+	var position = new Position(rearEllipse,{x:fuselage.geometry.position.x.val + varDict["l_Mission-Aircraft-Fuselage"]*0.5,y:0,z:0})
+	var rotation = new Rotation(rearEllipse,{x:0,y:0,z:-Math.PI/2})
+	rearEllipse.geometry = new Geometry(mesh,position,rotation)
+	drawEllipse(ComponentColors.fuselage,rearEllipse.geometry.mesh,rearEllipse.geometry.position,rearEllipse.geometry.rotation)
 
 	wing = new Object();
 	//syntax is span, aspect ratio, S
@@ -133,7 +132,7 @@ function updateRendering(varDict){
 	var position = new Position(cgSphere,{x:fuselage.geometry.position.x.val - 0.5*fuselage.geometry.mesh.h.val + varDict["x_cg"],y:0,z:fuselage.geometry.mesh.d.val/1.5})
 	var rotation = new Rotation(cgSphere,{x:0,y:0,z:Math.PI/2})
 	cgSphere.geometry = new Geometry(mesh,position,rotation)
-	drawCyl(0xFF0000,cgSphere.geometry.mesh,cgSphere.geometry.position,cgSphere.geometry.rotation)
+	drawCyl(Colors.columbia,cgSphere.geometry.mesh,cgSphere.geometry.position,cgSphere.geometry.rotation)
 	if (tailOption== "single"){
 		boom = new Object();
 		var mesh = new Mesh("cyl",boom,varDict["d_0"]*0.0833333,varDict["l_Mission-Aircraft-Empennage-TailBoom"])
@@ -144,7 +143,7 @@ function updateRendering(varDict){
 
 		horiz = new Object();
 		var mesh = new Mesh("liftSurf",horiz,varDict["b_Mission-Aircraft-Empennage-HorizontalTail"],varDict["S_Mission-Aircraft-Empennage-HorizontalTail"],varDict["lambda_h"])
-		var position = new Position(horiz,{x:boom.geometry.position.x.val+boom.geometry.mesh.h.val/2,y:boom.geometry.position.y.val,z:boom.geometry.position.z.val})
+		var position = new Position(horiz,{x:boom.geometry.position.x.val+boom.geometry.mesh.h.val/2,y:0,z:boom.geometry.position.z.val})
 		var rotation = fuselage.geometry.rotation;
 		horiz.geometry = new Geometry(mesh,position,rotation)
 		drawWing(ComponentColors.stabilizer,mesh,position,rotation);
@@ -264,6 +263,10 @@ Mesh = function(){
 		this.d = new Variable("d"+parentObj.nameStr,arguments[2],"m")
 		this.shaftLen = new Variable("shaftLen"+parentObj.nameStr,arguments[3],"m")
 	}
+	if (type=="ellipse"){
+		this.r = new Variable("r"+parentObj.nameStr,arguments[2],"m")
+		this.l = new Variable("l"+parentObj.nameStr,arguments[3],"m")
+	}
 }
 
 Position = function(parentObj,valDict){
@@ -362,6 +365,23 @@ drawHemi = function(color,mesh,position,rotation){
 	mesh.rotation.set(rotation.x.val,rotation.y.val,rotation.z.val)
 	// console.log(mesh)
 	mesh.material.side = THREE.DoubleSide;
+	mesh.castShadow = true;
+	mesh.receiveShadow = true;
+	geometry.dynamic = true
+	scene.add( mesh );
+}
+
+drawEllipse = function(color,mesh,position,rotation){
+	var points = [];
+	console.log(mesh)
+	for ( var i = 0; i < Math.PI/2; i=i+0.1 ) {
+		points.push( new THREE.Vector2( Math.cos(i) * mesh.r.val, Math.sin(i)*mesh.l.val ));
+	}
+	coneGeometry = new THREE.LatheGeometry( points );
+	material = new THREE.MeshPhongMaterial( { color: color} );
+	var mesh = new THREE.Mesh( coneGeometry, material );
+	mesh.position.set(position.x.val,position.y.val,position.z.val)
+	mesh.rotation.set(rotation.x.val,rotation.y.val,rotation.z.val)
 	mesh.castShadow = true;
 	mesh.receiveShadow = true;
 	geometry.dynamic = true
