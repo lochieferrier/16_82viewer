@@ -1,5 +1,9 @@
-// Select what type of tail you want to draw, either pi or dual
+// Options
 tailOption = "dual"
+CSVFileURL = "http://localhost:8000/sketch_params.csv"
+
+
+// Internal global variables
 CENTERX = 0
 CENTERY = 0
 CENTERZ = 0
@@ -57,9 +61,9 @@ function handleFileSelect_csv(evt) {
     document.getElementById('files_csv').addEventListener('change', handleFileSelect_csv, false);
 }
 
-function getCSVDataFromNode(){
+function getCSVFromServer(){
 	console.log('calling')
-	$.get( "http://localhost:8000/sketch_params.csv",function(msg) {
+	$.get(CSVFileURL ,function(msg) {
 		if (msg != CSVresult){
 			console.log('diff')
 			CSVresult = msg;
@@ -77,12 +81,15 @@ function getCSVDataFromNode(){
 		}
 	});
 }
+
 function startLiveReload(){
 	window.setInterval(function(){
-		getCSVDataFromNode();
+		getCSVFromServer();
 	}, 500);
 }
+
 function updateRendering(varDict){
+
 	CENTERX = varDict["x_cg"]
 	createScene();
 	createLights();

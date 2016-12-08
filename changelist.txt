@@ -9,10 +9,23 @@ Threw in the conversion, but it's probably best to output everything the same on
 not individually. I divided by 2 to correct this, they look okay (still a little fat) now.
 - What's useful to you in terms of camera positioning I'm not super sure about. Let me know if you want further control in
 this area, you can see how the camera is initially positioned in createScene().
+- The camera controls should make more sense now, pan is silly so I got rid of it, the whole thing rotates around C.G.
 
 I think what was also causing you confusion was the fact that the dummyDict was also present,
 as getDummyDict() was being called. I've commented that out, now only the data from the CSV
 is being included.
 
-
 Overall, bad communication on my part, I'm sorry about this, let me know if you need more help or further mods.
+
+Live reloading:
+The way I did this was to set up a simple python server to serve the csv file,
+and use an AJAX request on the browser side to continually check for updates.
+
+If the browser spots a change in the file, it redraws the rendering. Checks every
+500 ms, you can probably make it faster, given that it's a local filesystem.
+
+Process for using live reloading:
+- Run pyserver.py
+- Click the button that says "Start live reload"
+- Save changes to the csv file you specify at the top of vis.js, and the changes
+should show up in the sketch
