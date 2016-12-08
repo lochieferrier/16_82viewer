@@ -7,9 +7,11 @@ b_Mission-Aircraft-Empennage-HorizontalTail,4.53745815627,ft,horizontal tail spa
 b_Mission-Aircraft-Empennage-VerticalTail,2.86861351919,ft,one vertical tail span
 b_Mission-Aircraft-Wing,41.0357492111,ft,wing span
 d_0,3.44861556211,in,tail boom diameter
-eta,2.5,2.5,2.5
-fuse_len,10,10,10
 l_Mission-Aircraft-Empennage-TailBoom,13.6117028935,ft,tail boom length
 l_Mission-Aircraft-Fuselage,12.4888652561,ft,fuselage length
-lambda,2,2,2
-lambda_h,2,-,aspect ratio horizontal stabilizer
+lambda,0.5,2,2
+lambda_h,1,-,aspect ratio horizontal stabilizer
+lambda_v,1,-,aspect ratio vertical stabilizer
+x_cg,6,ft,x position of cg as measured from nose
+d_cg,1,ft,diameter of cg cyl
+h_cg,1,ft,height of cg cyl
