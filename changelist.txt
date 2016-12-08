@@ -7,6 +7,8 @@ Threw in the conversion, but it's probably best to output everything the same on
 - I don't know what eta refers to, and it's only used in the pi-tail, so I threw it out.
 - The vertical stabilizers had massive chord, which I think was because you meant the area for both verts,
 not individually. I divided by 2 to correct this, they look okay (still a little fat) now.
+- What's useful to you in terms of camera positioning I'm not super sure about. Let me know if you want further control in
+this area, you can see how the camera is initially positioned in createScene().
 
 I think what was also causing you confusion was the fact that the dummyDict was also present,
 as getDummyDict() was being called. I've commented that out, now only the data from the CSV

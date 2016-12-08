@@ -14,4 +14,4 @@ lambda_h,1,-,aspect ratio horizontal stabilizer
 lambda_v,1,-,aspect ratio vertical stabilizer
 x_cg,6,ft,x position of cg as measured from nose
 d_cg,1,ft,diameter of cg cyl
-h_cg,1,ft,height of cg cyl
+h_cg,0.1,ft,height (or length) of cg cyl

@@ -1,6 +1,8 @@
 // Select what type of tail you want to draw, either pi or dual
 tailOption = "dual"
-
+CENTERX = 0
+CENTERY = 0
+CENTERZ = 0
 var Colors = {
 	//Colorscheme from
 	//https://coolors.co/app/0a122a-274c77-6096ba-a3cef1-cdd6dd
@@ -33,13 +35,13 @@ function handleFileSelect_csv(evt) {
         reader.onload = function(event)
         {
         	var contents = event.target.result
-        	console.log(contents)
+        	// console.log(contents)
         	parsedData = Papa.parse(contents)
         	var varDict = new Object();
         	// varDict = getDummyDict();
 			for (var i = 0; i < parsedData.data.length; i ++){
 			  dataLine =parsedData.data[i]
-			  console.log(dataLine)
+			//   console.log(dataLine)
 			  if (dataLine[0]!= ''){
 			  	varDict[dataLine[0]] = parseFloat(dataLine[1])
 			  }
@@ -79,8 +81,10 @@ function handleFileSelect_csv(evt) {
 // }
 
 function updateRendering(varDict){
-
-	init();
+	CENTERX = varDict["x_cg"]
+	createScene();
+	createLights();
+	render();
 
 	//Geometry
 	fuselage = new Object();
@@ -314,6 +318,7 @@ drawCyl = function(color,mesh,position,rotation){
 	mesh.receiveShadow = true;
 	geometry.dynamic = true
 	scene.add( mesh );
+	// console.log(scene)
 	return mesh;
 }
 
@@ -324,7 +329,7 @@ drawHemi = function(color,mesh,position,rotation){
 	var mesh = new THREE.Mesh( geometry, material );
 	mesh.position.set(position.x.val,position.y.val,position.z.val)
 	mesh.rotation.set(rotation.x.val,rotation.y.val,rotation.z.val)
-	console.log(mesh)
+	// console.log(mesh)
 	mesh.material.side = THREE.DoubleSide;
 	mesh.castShadow = true;
 	mesh.receiveShadow = true;
@@ -398,6 +403,85 @@ var container
 var camera, controls, scene, renderer;
 var cross;
 
+createScene = function(){
+	scene = new THREE.Scene();
+	var HEIGHT = $('#threedview').height();
+	var WIDTH = $('#threedview').width();
+	// Create the camera
+	console.log(HEIGHT,WIDTH)
+	if (typeof camera == 'undefined'){
+		aspectRatio = WIDTH / HEIGHT;
+		fieldOfView = 60;
+		nearPlane = 0.001;
+		farPlane = 10000;
+		camera = new THREE.PerspectiveCamera(
+			fieldOfView,
+			aspectRatio,
+			nearPlane,
+			farPlane
+		);
+		// Set the position of the camera
+		camera.position.x = -10
+		camera.position.y = 0
+		camera.position.z = 10
+
+		camera.up = new THREE.Vector3(0,0,1);
+		camera.lookAt(new THREE.Vector3(10,10,1));
+		renderer = new THREE.WebGLRenderer({
+		// Allow transparency to show the gradient background
+		// we defined in the CSS
+			alpha: true,
+			antialias: true}
+		);
+		renderer.setSize( WIDTH,HEIGHT );
+	}
+	raycaster = new THREE.Raycaster();
+	container = document.getElementById('threedview');
+	container.appendChild(renderer.domElement);
+	controls = new THREE.TrackballControls( camera,renderer.domElement );
+	controls.target.x = CENTERX
+	controls.target.y = CENTERY
+	controls.target.z = CENTERZ
+	// renderer.domElement.addEventListener('mousedown', onMouseDown, false);
+	// renderer.domElement.addEventListener('mousemove', onMouseMove, false);
+	window.addEventListener( 'resize', onWindowResize, false );
+}
+
+function createLights() {
+	// A hemisphere light is a gradient colored light;
+	// the first parameter is the sky color, the second parameter is the ground color,
+	// the third parameter is the intensity of the light
+	hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0x000000, .9)
+
+	// A directional light shines from a specific direction.
+	// It acts like the sun, that means that all the rays produced are parallel.
+	shadowLight = new THREE.DirectionalLight(0xffffff, .9);
+
+	// Set the direction of the light
+	shadowLight.position.set(150, 350, 350);
+
+	// Allow shadow casting
+	shadowLight.castShadow = true;
+
+	// define the visible area of the projected shadow
+	shadowLight.shadow.camera.left = -400;
+	shadowLight.shadow.camera.right = 400;
+	shadowLight.shadow.camera.top = 400;
+	shadowLight.shadow.camera.bottom = -400;
+	shadowLight.shadow.camera.near = 1;
+	shadowLight.shadow.camera.far = 1000;
+
+	// define the resolution of the shadow; the higher the better,
+	// but also the more expensive and less performant
+	shadowLight.shadow.mapSize.width = 2048;
+	shadowLight.shadow.mapSize.height = 2048;
+
+	// to activate the lights, just add them to the scene
+	scene.add(hemisphereLight);
+	scene.add(shadowLight);
+}
+
+
 function init() {
 	camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
 	camera.position.z = 50;
@@ -442,9 +526,12 @@ function animate() {
 	controls.update();
 }
 
-function render() {
-	renderer.render( scene, camera );
-}
+render = function () {
+	requestAnimationFrame( render );
+	controls.update()
+	// changes to the vertices
+	renderer.render(scene, camera);
+};
 
 drawFoil = function(){
 	var extrudeSettings = {
