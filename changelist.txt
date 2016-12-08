@@ -9,6 +9,8 @@ Threw in the conversion, but it's probably best to output everything the same on
 this area, you can see how the camera is initially positioned in createScene().
 - The camera controls should make more sense now, pan is silly so I got rid of it, the whole thing rotates around C.G.
 - That vertical stabilizer is bad on your end I'm pretty sure. It shouldn't have half the span of the horizontal but almost twice the area.
+- Now using "ellipse" shapes (I don't think that's what they're called) for the front and end caps. You set a radius (in this case
+equal to the fuselage radius), and a length.
 
 I think what was also causing you confusion was the fact that the dummyDict was also present,
 as getDummyDict() was being called. I've commented that out, now only the data from the CSV
