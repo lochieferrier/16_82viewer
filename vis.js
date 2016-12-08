@@ -64,6 +64,7 @@ function handleFileSelect_csv(evt) {
 function getCSVFromServer(){
 	console.log('calling')
 	$.get(CSVFileURL ,function(msg) {
+		console.log(msg)
 		if (msg != CSVresult){
 			console.log('diff')
 			CSVresult = msg;
@@ -85,7 +86,7 @@ function getCSVFromServer(){
 function startLiveReload(){
 	window.setInterval(function(){
 		getCSVFromServer();
-	}, 500);
+	}, 2000);
 }
 
 function updateRendering(varDict){
