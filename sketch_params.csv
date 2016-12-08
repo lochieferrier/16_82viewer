@@ -1,18 +1,17 @@
 ,Value,Units,Label
-R_Mission-Aircraft-Fuselage,0.566479808701,ft,fuselage radius
-S_Mission-Aircraft-Empennage-HorizontalTail,7.09661740346,ft**2,horizontal tail area
-S_Mission-Aircraft-Empennage-VerticalTail,12.1689357865,ft**2,total vertical tail surface area
-S_Mission-Aircraft-Wing,80.7295792828,ft**2,surface area
+R_Mission-Aircraft-Fuselage,0.566479808718,ft,fuselage radius
+S_Mission-Aircraft-Empennage-HorizontalTail,7.09661740303,ft**2,horizontal tail area
+S_Mission-Aircraft-Empennage-VerticalTail,12.1689357874,ft**2,total vertical tail surface area
+S_Mission-Aircraft-Wing,80.7295792845,ft**2,surface area
 \lambda_Mission-Aircraft-Empennage-HorizontalTail,0.8,,horizontal tail taper ratio
 \lambda_Mission-Aircraft-Empennage-VerticalTail,0.7,,vertical tail taper ratio
 \lambda_Mission-Aircraft-Wing,0.5,,wing taper ratio
 \tau_Mission-Aircraft-Wing,0.115,,airfoil thickness ratio
-b_Mission-Aircraft-Empennage-HorizontalTail,4.53745815523,ft,horizontal tail span
-b_Mission-Aircraft-Empennage-VerticalTail,2.86861351621,ft,one vertical tail span
-b_Mission-Aircraft-Wing,41.0357492081,ft,wing span
-d_0,0.28738463017768628,ft,tail boom diameter
-k_{body},18.3027575786,,fuselage body length to radius ratio
-k_{bulk},7.27238528204,,fuselage bulk length to radius ratio
-k_{nose},2.98166237536,,fuselage nose length to radius ratio
-l_Mission-Aircraft-Empennage-TailBoom,13.6117028939,ft,tail boom length
-l_Mission-Aircraft-Fuselage,12.4888652569,ft,fuselage length
+b_Mission-Aircraft-Empennage-HorizontalTail,4.53745815573,ft,horizontal tail span
+b_Mission-Aircraft-Empennage-VerticalTail,2.86861351755,ft,one vertical tail span
+b_Mission-Aircraft-Wing,41.0357492097,ft,wing span
+d_0,0.2873846301787088,ft,tail boom diameter
+k_{body},18.3027575765,,fuselage body length to radius ratio
+k_{bulk},7.27238528182,,fuselage bulk length to radius ratio
+k_{nose},2.98166237528,,fuselage nose length to radius ratio
+l_Mission-Aircraft-Empennage-TailBoom,13.6117028938,ft,tail boom length
