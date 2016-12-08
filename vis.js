@@ -21,13 +21,13 @@ var ComponentColors = {
 }
 
 function handleFileSelect_csv(evt) {
-    
+
     var files = evt.target.files; // FileList object
   	var varDict = new Object();
 
     // files is a FileList of File objects. List some properties.
     var output = [];
-    
+
     for (var i = 0, f; f = files[i]; i++) {
        var reader = new FileReader();
         reader.onload = function(event)
@@ -36,7 +36,7 @@ function handleFileSelect_csv(evt) {
         	console.log(contents)
         	parsedData = Papa.parse(contents)
         	var varDict = new Object();
-        	varDict = getDummyDict();
+        	// varDict = getDummyDict();
 			for (var i = 0; i < parsedData.data.length; i ++){
 			  dataLine =parsedData.data[i]
 			  console.log(dataLine)
@@ -52,69 +52,71 @@ function handleFileSelect_csv(evt) {
 
         	console.log(varDict)
     		updateRendering(varDict);
-     	
+
      	}
         reader.readAsText(f);
     }
     document.getElementById('files_csv').addEventListener('change', handleFileSelect_csv, false);
 }
 
-function getDummyDict(){
-	var varDict = new Object();
-	varDict["S_Mission, Aircraft, Wing"] = 20;
-	varDict["b_Mission, Aircraft, Wing"] = 30;
-	varDict["l_Mission, Aircraft, Fuselage"] = 3;
-	varDict["d_0"] = 4;
-	varDict["l_Mision, Aircraft, Empennage, TailBoom"] = 10;
-    //length out to booms
-	varDict["S_Mission, Aircraft, Empennage, HorizontalTail"] = 5;
-	varDict["S_Mission, Aircraft, Empennage, VerticalTail"] = 4;
-	varDict["b_Mission, Aircraft, Empennage, HorizontalTail"] = 4;
-	varDict["b_Mission, Aircraft, Empennage, VerticalTail"] = 5;
-	varDict["lambda"] = 2;
-	varDict["eta"] = 2.5;
-	varDict["fuse_len"] = 10;
-
-	//Constants used to draw something really
-	varDict["tailBoomAR"] = 20;
-	varDict["lambda_h"] = 1;
-	varDict["lambda_v"] = 1;
-	varDict["shaft_len"] = 1;
-	varDict["d_prop"] = 5;
-	return varDict;
-}
+// function getDummyDict(){
+// 	var varDict = new Object();
+// 	varDict["S_Mission, Aircraft, Wing"] = 20;
+// 	varDict["b_Mission, Aircraft, Wing"] = 30;
+// 	varDict["l_Mission, Aircraft, Fuselage"] = 3;
+// 	varDict["d_0"] = 4;
+// 	varDict["l_Mision, Aircraft, Empennage, TailBoom"] = 10;
+//     //length out to booms
+// 	varDict["S_Mission, Aircraft, Empennage, HorizontalTail"] = 5;
+// 	varDict["S_Mission, Aircraft, Empennage, VerticalTail"] = 4;
+// 	varDict["b_Mission, Aircraft, Empennage, HorizontalTail"] = 4;
+// 	varDict["b_Mission, Aircraft, Empennage, VerticalTail"] = 5;
+// 	varDict["lambda"] = 2;
+// 	varDict["eta"] = 2.5;
+// 	varDict["fuse_len"] = 10;
+//
+// 	//Constants used to draw something really
+// 	varDict["tailBoomAR"] = 20;
+// 	varDict["lambda_h"] = 1;
+// 	varDict["lambda_v"] = 1;
+// 	varDict["shaft_len"] = 1;
+// 	varDict["d_prop"] = 5;
+// 	return varDict;
+// }
 
 function updateRendering(varDict){
-	
+
 	init();
-  	
+
 	//Geometry
 	fuselage = new Object();
-	var mesh = new Mesh("cyl",fuselage, varDict["R_Mission, Aircraft, Fuselage"]/2, varDict["l_Mission, Aircraft, Fuselage"])
+	var mesh = new Mesh("cyl",fuselage, varDict["R_Mission-Aircraft-Fuselage"]/2, varDict["l_Mission-Aircraft-Fuselage"])
 	var position = new Position(fuselage,{x:varDict["fuse_len"]/2,y:0,z:0})
 	var rotation = new Rotation(fuselage,{x:0,y:0,z:Math.PI/2})
 	fuselage.geometry = new Geometry(mesh,position,rotation)
 	drawCyl(ComponentColors.fuselage,fuselage.geometry.mesh,fuselage.geometry.position,fuselage.geometry.rotation)
-	
+	console.log('drew fuselage')
+
 	frontCap = new Object();
-	var mesh = new Mesh("hemi",frontCap,varDict["R_Mission, Aircraft, Fuselage"]/2)
-	var position = new Position(frontCap,{x:fuselage.geometry.position.x.val + varDict["l_Mission, Aircraft, Fuselage"]*0.5,y:0,z:0})
+	var mesh = new Mesh("hemi",frontCap,varDict["R_Mission-Aircraft-Fuselage"]/2)
+	var position = new Position(frontCap,{x:fuselage.geometry.position.x.val + varDict["l_Mission-Aircraft-Fuselage"]*0.5,y:0,z:0})
 	var rotation = new Rotation(frontCap,{x:0,y:0,z:-Math.PI/2})
 	frontCap.geometry = new Geometry(mesh,position,rotation)
 	drawHemi(ComponentColors.fuselage,frontCap.geometry.mesh,frontCap.geometry.position,frontCap.geometry.rotation)
+	console.log('drew front cap')
 
 	rearCap = new Object();
-	var mesh = new Mesh("hemi",frontCap,varDict["R_Mission, Aircraft, Fuselage"]/2)
+	var mesh = new Mesh("hemi",frontCap,varDict["R_Mission-Aircraft-Fuselage"]/2)
 	var position = new Position(frontCap,{x:fuselage.geometry.position.x.val-varDict["l_{fuel}"]*0.5,y:0,z:0})
 	var rotation = new Rotation(frontCap,{x:0,y:0,z:Math.PI/2})
 	frontCap.geometry = new Geometry(mesh,position,rotation)
 	drawHemi(ComponentColors.fuselage,frontCap.geometry.mesh,frontCap.geometry.position,frontCap.geometry.rotation)
+	console.log('drew last')
 
-	
 	wing = new Object();
 	//syntax is span, aspect ratio, S
-	var mesh = new Mesh("liftSurf",wing,varDict["b_Mission, Aircraft, Fuselage"],varDict["S_Mission, Aircraft, Fuselage"],varDict["lambda"])
-	var position = new Position(wing,{x:fuselage.geometry.position.x.val,y:0,z:fuselage.geometry.mesh.d.val/2}) 
+	var mesh = new Mesh("liftSurf",wing,varDict["b_Mission-Aircraft-Wing"],varDict["S_Mission-Aircraft-Fuselage"],varDict["lambda"])
+	var position = new Position(wing,{x:fuselage.geometry.position.x.val,y:0,z:fuselage.geometry.mesh.d.val/2})
 	var rotation = fuselage.geometry.rotation
 	wing.geometry = new Geometry(mesh,position,rotation)
 	drawWing(ComponentColors.wing,wing.geometry.mesh,wing.geometry.position,wing.geometry.rotation)
@@ -122,14 +124,14 @@ function updateRendering(varDict){
 		//Draw tails -1 is left when viewed from rear, +1 is right
 		for (var i = -1; i < 2; i = i+2){
 			boom = new Object();
-			var mesh = new Mesh("cyl",boom,varDict["d_0"],varDict["l_Mission, Aircraft, Empennage, TailBoom"])
-			var position = new Position(boom,{x:varDict["fuse_len"]/2+varDict["Mission, Aircraft, Empennage, TailBoom"]/2,y:i*varDict["b_Mission, Aircraft, Empennage, HorizontalTail"]*0.5,z:fuselage.geometry.mesh.d.val/2})
+			var mesh = new Mesh("cyl",boom,varDict["d_0"],varDict["l_Mission-Aircraft-Empennage-TailBoom"])
+			var position = new Position(boom,{x:varDict["fuse_len"]/2+varDict["l_Mission-Aircraft-Empennage-TailBoom"]/2,y:i*varDict["b_Mission, Aircraft, Empennage, HorizontalTail"]*0.5,z:fuselage.geometry.mesh.d.val/2})
 			var rotation = fuselage.geometry.rotation;
 			boom.geometry = new Geometry(mesh,position,rotation)
 			drawCyl(ComponentColors.fuselage,mesh,position,rotation)
 
 			horiz = new Object();
-			var mesh = new Mesh("liftSurf",horiz,varDict["b_Mission, Aircraft, Empennage, HorizontalTail"],varDict["S_Mission, Aircraft, Empennage, HorizontalTail"],varDict["lambda_h"])
+			var mesh = new Mesh("liftSurf",horiz,varDict["b_Mission-Aircraft-Empennage-HorizontalTail"],varDict["S_Mission-Aircraft-Empennage-HorizontalTail"],varDict["lambda_h"])
 			var position = new Position(horiz,{x:boom.geometry.position.x.val+boom.geometry.mesh.h.val/2,y:boom.geometry.position.y.val,z:boom.geometry.position.z.val})
 			var rotation = fuselage.geometry.rotation;
 			horiz.geometry = new Geometry(mesh,position,rotation)
@@ -172,6 +174,8 @@ function updateRendering(varDict){
 		}
 
 	}
+	console.log('drew everything')
+
 	// prop = new Object();
 	// var mesh = new Mesh("prop",prop,varDict["d_prop"],varDict["shaft_len"])
 	// var position = new Position(prop,{x:boom.geometry.position.x.val+boom.geometry.mesh.h.val/2,y:boom.geometry.position.y.val,z:boom.geometry.position.z.val})
@@ -187,7 +191,7 @@ renderVarDict = function(varDict){
 	varDictStr = ""
 	for (var varKey in varDict){
 		variable = varDict[varKey]
-		varDictStr = varDictStr + '<li>'+varKey+' : '+variable+'</li>' 
+		varDictStr = varDictStr + '<li>'+varKey+' : '+variable+'</li>'
 	}
 	$('#varDictView').html(varDictStr)
 }
@@ -234,7 +238,6 @@ Position = function(parentObj,valDict){
 	if (valDict.z == undefined){
 		this.z = new Variable("zpos"+parentObj.nameStr,"m")
 	}
-	console.log(this)
 }
 
 Rotation = function(parentObj,valDict){
@@ -333,7 +336,7 @@ drawWing = function(color,mesh,position,rotation){
 				bevelEnabled	: false,
 				amount			: rootHalfChord*0.2
 	};
-	
+
 	var pts = [
                  new THREE.Vector2(halfSpan,tipHalfChord),
                  new THREE.Vector2(halfSpan,-tipHalfChord),
@@ -379,7 +382,7 @@ drawProp = function(color,mesh,position,rotation){
 }
 
 $(document).ready(function(){
-	
+
   document.getElementById('files_csv').addEventListener('change', handleFileSelect_csv, false);
 
 });
@@ -445,7 +448,7 @@ drawFoil = function(){
 	};
 	a = 10
 	b = 10
-	var line = new THREE.SplineCurve( 
+	var line = new THREE.SplineCurve(
                 [
                  new THREE.Vector2(a*0.0000000, b*0.0000000),
 				 new THREE.Vector2(a*0.0005839, b*0.0042603),
@@ -583,26 +586,26 @@ drawFoil = function(){
                 ]);
 	var shape = new THREE.Shape(line.getSpacedPoints(100));
 	var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
-	
+
 	var material = new THREE.MeshLambertMaterial( { color: 0xb00000, wireframe: false } );
 	var mesh = new THREE.Mesh( geometry, material );
 	scene.add( mesh );
 }
 
 function createLights() {
-	// A hemisphere light is a gradient colored light; 
-	// the first parameter is the sky color, the second parameter is the ground color, 
+	// A hemisphere light is a gradient colored light;
+	// the first parameter is the sky color, the second parameter is the ground color,
 	// the third parameter is the intensity of the light
 	hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0x000000, .9)
-	
-	// A directional light shines from a specific direction. 
-	// It acts like the sun, that means that all the rays produced are parallel. 
+
+	// A directional light shines from a specific direction.
+	// It acts like the sun, that means that all the rays produced are parallel.
 	shadowLight = new THREE.DirectionalLight(0xffffff, .9);
 
-	// Set the direction of the light  
+	// Set the direction of the light
 	shadowLight.position.set(0, 0, 25);
-	
-	// Allow shadow casting 
+
+	// Allow shadow casting
 	shadowLight.castShadow = true;
 
 	// define the visible area of the projected shadow
@@ -613,12 +616,12 @@ function createLights() {
 	shadowLight.shadow.camera.near = 1;
 	shadowLight.shadow.camera.far = 1000;
 
-	// define the resolution of the shadow; the higher the better, 
+	// define the resolution of the shadow; the higher the better,
 	// but also the more expensive and less performant
 	shadowLight.shadow.mapSize.width = 2048;
 	shadowLight.shadow.mapSize.height = 2048;
-	
+
 	// to activate the lights, just add them to the scene
-	scene.add(hemisphereLight);  
+	scene.add(hemisphereLight);
 	scene.add(shadowLight);
 }

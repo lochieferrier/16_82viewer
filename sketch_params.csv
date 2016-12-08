@@ -12,3 +12,4 @@ fuse_len,10,10,10
 l_Mission-Aircraft-Empennage-TailBoom,13.6117028935,ft,tail boom length
 l_Mission-Aircraft-Fuselage,12.4888652561,ft,fuselage length
 lambda,2,2,2
+lambda_h,2,-,aspect ratio horizontal stabilizer
