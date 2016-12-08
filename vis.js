@@ -100,8 +100,8 @@ function updateRendering(varDict){
 
 	//Geometry
 	fuselage = new Object();
-	var mesh = new Mesh("cyl",fuselage, varDict["R_Mission-Aircraft-Fuselage"]*2, varDict["l_Mission-Aircraft-Fuselage"])
-	var position = new Position(fuselage,{x:varDict["l_Mission-Aircraft-Fuselage"]/2,y:0,z:0})
+	var mesh = new Mesh("cyl",fuselage, varDict["R_Mission-Aircraft-Fuselage"]*2, varDict["R_Mission-Aircraft-Fuselage"]*varDict["k_{body}"])
+	var position = new Position(fuselage,{x:varDict["R_Mission-Aircraft-Fuselage"]*varDict["k_{body}"]/2,y:0,z:0})
 	var rotation = new Rotation(fuselage,{x:0,y:0,z:Math.PI/2})
 	fuselage.geometry = new Geometry(mesh,position,rotation)
 	drawCyl(ComponentColors.fuselage,fuselage.geometry.mesh,fuselage.geometry.position,fuselage.geometry.rotation)
@@ -109,15 +109,15 @@ function updateRendering(varDict){
 
 
 	frontEllipse = new Object();
-	var mesh = new Mesh("ellipse",frontEllipse,varDict["R_Mission-Aircraft-Fuselage"],varDict["front_ellipse_length"])
-	var position = new Position(frontEllipse,{x:fuselage.geometry.position.x.val - varDict["l_Mission-Aircraft-Fuselage"]*0.5,y:0,z:0})
+	var mesh = new Mesh("ellipse",frontEllipse,varDict["R_Mission-Aircraft-Fuselage"],varDict["R_Mission-Aircraft-Fuselage"]*varDict["k_{nose}"])
+	var position = new Position(frontEllipse,{x:fuselage.geometry.position.x.val - varDict["R_Mission-Aircraft-Fuselage"]*varDict["k_{body}"]*0.5,y:0,z:0})
 	var rotation = new Rotation(frontEllipse,{x:0,y:0,z:Math.PI/2})
 	frontEllipse.geometry = new Geometry(mesh,position,rotation)
 	drawEllipse(ComponentColors.fuselage,frontEllipse.geometry.mesh,frontEllipse.geometry.position,frontEllipse.geometry.rotation)
 
 	rearEllipse = new Object();
-	var mesh = new Mesh("ellipse",rearEllipse,varDict["R_Mission-Aircraft-Fuselage"],varDict["rear_ellipse_length"])
-	var position = new Position(rearEllipse,{x:fuselage.geometry.position.x.val + varDict["l_Mission-Aircraft-Fuselage"]*0.5,y:0,z:0})
+	var mesh = new Mesh("ellipse",rearEllipse,varDict["R_Mission-Aircraft-Fuselage"],varDict["R_Mission-Aircraft-Fuselage"]*varDict["k_{bulk}"])
+	var position = new Position(rearEllipse,{x:fuselage.geometry.position.x.val + varDict["R_Mission-Aircraft-Fuselage"]*varDict["k_{body}"]*0.5,y:0,z:0})
 	var rotation = new Rotation(rearEllipse,{x:0,y:0,z:-Math.PI/2})
 	rearEllipse.geometry = new Geometry(mesh,position,rotation)
 	drawEllipse(ComponentColors.fuselage,rearEllipse.geometry.mesh,rearEllipse.geometry.position,rearEllipse.geometry.rotation)

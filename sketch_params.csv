@@ -1,19 +1,18 @@
 ,Value,Units,Label
-R_Mission-Aircraft-Fuselage,0.566479808733,ft,fuselage radius
-S_Mission-Aircraft-Empennage-HorizontalTail,7.09661740238,ft**2,horizontal tail area
-S_Mission-Aircraft-Empennage-VerticalTail,12.168935788,ft**2,total vertical tail surface area
-S_Mission-Aircraft-Wing,80.7295792848,ft**2,surface area
-b_Mission-Aircraft-Empennage-HorizontalTail,4.53745815627,ft,horizontal tail span
-b_Mission-Aircraft-Empennage-VerticalTail,2.86861351919,ft,one vertical tail span
-b_Mission-Aircraft-Wing,41.0357492111,ft,wing span
-d_0,3.44861556211,in,tail boom diameter
-l_Mission-Aircraft-Empennage-TailBoom,13.6117028935,ft,tail boom length
-l_Mission-Aircraft-Fuselage,12.4888652561,ft,fuselage length
-front_ellipse_length,3,ft
-rear_ellipse_length,2,ft
-lambda,0.5,-,taper ratio main wing
-lambda_h,1,-,taper ratio horizontal stabilizer
-lambda_v,1,-,taper ratio vertical stabilizer
-x_cg,6,ft,x position of cg as measured from nose
-d_cg,1,ft,diameter of cg cyl
-h_cg,0.1,ft,height (or length) of cg cyl
+R_Mission-Aircraft-Fuselage,0.566479808701,ft,fuselage radius
+S_Mission-Aircraft-Empennage-HorizontalTail,7.09661740346,ft**2,horizontal tail area
+S_Mission-Aircraft-Empennage-VerticalTail,12.1689357865,ft**2,total vertical tail surface area
+S_Mission-Aircraft-Wing,80.7295792828,ft**2,surface area
+\lambda_Mission-Aircraft-Empennage-HorizontalTail,0.8,,horizontal tail taper ratio
+\lambda_Mission-Aircraft-Empennage-VerticalTail,0.7,,vertical tail taper ratio
+\lambda_Mission-Aircraft-Wing,0.5,,wing taper ratio
+\tau_Mission-Aircraft-Wing,0.115,,airfoil thickness ratio
+b_Mission-Aircraft-Empennage-HorizontalTail,4.53745815523,ft,horizontal tail span
+b_Mission-Aircraft-Empennage-VerticalTail,2.86861351621,ft,one vertical tail span
+b_Mission-Aircraft-Wing,41.0357492081,ft,wing span
+d_0,0.28738463017768628,ft,tail boom diameter
+k_{body},18.3027575786,,fuselage body length to radius ratio
+k_{bulk},7.27238528204,,fuselage bulk length to radius ratio
+k_{nose},2.98166237536,,fuselage nose length to radius ratio
+l_Mission-Aircraft-Empennage-TailBoom,13.6117028939,ft,tail boom length
+l_Mission-Aircraft-Fuselage,12.4888652569,ft,fuselage length
